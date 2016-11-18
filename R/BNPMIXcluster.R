@@ -5,7 +5,7 @@
 #'     The \strong{BNPMIXcluster} package...
 #'
 #' @section BNPMIXcluster functions:
-#' \code{\link{MIXcluster}}
+#' \code{\link{MIXclustering}}
 #'
 #' @docType package
 #' @name BNPMIXcluster

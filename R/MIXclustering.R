@@ -1,5 +1,5 @@
 #' @title
-#'     Model based clustering for mixed scale variables
+#'     Model based clustering for mixed scale variables.
 #'
 #' @description
 #'     Model based clustering for mixed scale variables
@@ -80,21 +80,26 @@
 #' \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
 #'
 #' @examples
-#' # Clustering simulated data in "sim.cluster" #
+#' # Clustering simulated data in "sim.cluster.data" #
 #' # for more information about the data:
-#' \dontrun{ help(sim.cluster) }
+#' \dontrun{ help(sim.cluster.data) }
 #'
 #' # exercise using 1 continuous, 1 nominal and 1 ordinal variables
 #'
-#' Y_data <- matrix(NA,nrow=nrow(sim.cluster),ncol=3)
+#' Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
 #' colnames(Y_data) <- paste("Y",1:3,sep=".")
-#' Y_data[,1] <- sim.cluster[,2]
-#' Y_data[,2] <- findInterval( sim.cluster[,3], c(-Inf,4,5,Inf) )
-#' Y_data[,3] <- findInterval( sim.cluster[,4], c(-Inf,3,Inf) )
+#' Y_data[,1] <- sim.cluster.data[,2]
+#' Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )
+#' Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )
+#'
 #' set.seed(12345) # for reproducibility
+#'
 #' cluster_estim <- MIXclustering( Y_data,
 #'                           var_type=c("c","m","o"),
-#'                           n.iter_out=100 )
+#'                           n.iter_out=100, # less than the default=1000 (faster example)
+#'                           n.burn=20, # less than the default=50
+#'                           n.thin=3,
+#'                           )
 #'
 #' cluster_estim
 #'
@@ -106,13 +111,35 @@
 #' plot(cluster_estim,type="chain",chain.obj="all")
 #'
 #' # Comparison with the original clusters in the simulated data
-#' plot(x=jitter(sim.cluster$cluster),
+#' plot(x=jitter(sim.cluster.data$cluster),
 #'      y=jitter(cluster_estim$cluster),
 #'      main="",
 #'      xlab="Real cluster",
 #'      ylab="Model cluster",
 #'      pch=19, col="#FF000020")
 #'
+#'
+#'
+#' ##### Testing "MIXclustering" function with poverty.data #####
+#' # Using entity 15 (Estado de Mexico) #
+#'
+#' \dontrun{
+#' Y_names <- c("ict_norm",
+#'              "ic_ali","ic_asalud","ic_cv",
+#'              "ic_rezedu","ic_sbv","ic_segsoc",
+#'              "niv_ed","tam_loc")
+#' aux_subset <- rep(T,nrow(poverty.data))
+#' aux_subset <- aux_subset & is.element(substr(poverty.data$folioviv,1,2),"15")
+#'
+#' poverty_cluster_estim <- MIXclustering(x=poverty.data[aux_subset,Y_names],
+#'                                        var_type=c("c","o","o","o","o","o","o","m","m"),
+#'                                        expansion_f = poverty.data[aux_subset,"factor_hog"],
+#'
+#'                                        n.iter_out=1000,
+#'                                        n.burn=100,
+#'                                        n.thin=3
+#'                                        )
+#' }
 #' @references
 #' Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 #'
@@ -124,22 +151,22 @@
 MIXclustering <- function( x,
                      var_type,
 
-                     n.iter_out=100,
-                     n.burn=20,
+                     n.iter_out=1000,
+                     n.burn=100,
                      n.thin=3,
 
                      a_fix=NULL,
                      alpha=0.5,
-                     d_0_a=1, d_1_a=5,
+                     d_0_a=1, d_1_a=1,
 
                      b_fix=NULL,
                      d_0_b=1, d_1_b=5,
                      eta=2,
 
-                     d_0_z=1, d_1_z=1,
+                     d_0_z=2.1, d_1_z=30,
                      kappa=5, delta=4,
 
-                     d_0_mu=1, d_1_mu=1,
+                     d_0_mu=2.1, d_1_mu=30,
 
                      sampling_prob=NULL,
                      expansion_f=NULL,
@@ -361,16 +388,19 @@ MIXclustering <- function( x,
   #}
   time_sim <- Sys.time()
 
-  pb <- plyr::create_progress_bar("time")
-  pb$init(n.iter)
-
-  on.exit(pb$term())
-
-  lsa_iter <- c(ls(),"iter_i","lsa_iter")
+  lsa_iter <- c(ls(),"iter_i","lsa_iter","pb")
 
   for( iter_i in 1:n.iter) {
+
+    if(iter_i==1) {
+      # initializing progress bar
+      pb <- plyr::create_progress_bar("time")
+      pb$init(n.iter)
+
+      on.exit(pb$term())
+    }
+
     # iter_i<-1
-    pb$step()
 
     if(dev_verbose) {
       cat('\n**-- iter_i=',iter_i,' --**\n\n')
@@ -761,6 +791,8 @@ MIXclustering <- function( x,
     if(dev_verbose) {
       cat('\n   Finished iter_i=',iter_i,', \n     elapsed time:\n          ',format(diff(time_sim)[iter_i]),' this iteration\n          ',format(diff(time_sim[c(1,length(time_sim))])), ' total\n**----**',sep='')
     }
+
+    pb$step()
 
     rm(list=setdiff(ls(),lsa_iter)); gc()
   }
