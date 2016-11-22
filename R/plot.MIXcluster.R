@@ -24,7 +24,7 @@
 #' @param ...	further arguments passed to or from other methods.
 #'
 #' @seealso
-#' \code{\link{cluster}}
+#' \code{\link{MIXclustering}}
 #'
 #' @importFrom graphics abline barplot hist layout par plot
 #' @importFrom stats heatmap

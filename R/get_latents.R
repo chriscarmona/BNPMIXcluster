@@ -26,6 +26,7 @@
 #'     if \code{var_type} is continuos, the corresponding \eqn{Z} will keep the original values of \eqn{Y}.
 #'     If \eqn{Y} is categorical, the function will scan the unique values of \eqn{Y} and generate continuous latent variables accordingly.
 #'
+#' @keywords internal
 
 get_latents <- function( Y,
                          var_type,

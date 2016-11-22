@@ -16,52 +16,52 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 \item{var_type}{Character vector that indicates the type of variable in each column of x. Three possible types:
 \itemize{
   \item "\strong{c}" for continuous variables.
-  \item "\strong{o}" for ordinal variables (ordered categorical).
+  \item "\strong{o}" for ordinal variables (binary and ordered categorical).
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
 
 \item{n.iter_out}{Number of efective iterations in the MCMC procedure for clustering.}
 
-\item{n.burn}{Number of iterations discarded as part of the burn-in period at the beggining MCMC procedure.}
+\item{n.burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
-\item{n.thin}{Number of iterations discarded between two effective iterations, with the purpose of reducing the autocorrelation using thinning in the chain.}
+\item{n.thin}{Number of iterations discarded between two effective iterations, with the purpose of reducing the autocorrelation in the chain.}
 
-\item{a_fix}{A numeric value used to fix the dinamic of the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter is set free to vary according to its posterior distribution. See \code{details}.}
+\item{a_fix}{A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.}
 
-\item{alpha}{Hyperparameter in the distribution of \eqn{a}. See \code{details}.}
+\item{alpha}{Hyperparameter in the prior distribution of \eqn{a}. See \code{details}.}
 
-\item{d_0_a}{Hyperparameter in the distribution of \eqn{a}. See \code{details}.}
+\item{d_0_a}{Hyperparameter in the prior distribution of \eqn{a}. See \code{details}.}
 
-\item{d_1_a}{Hyperparameter in the distribution of \eqn{a}. See \code{details}.}
+\item{d_1_a}{Hyperparameter in the prior distribution of \eqn{a}. See \code{details}.}
 
-\item{b_fix}{A numeric value used to fix the dinamic of the parameter \eqn{b} in the model. If \code{NULL} (default), the parameter is set free to vary according to its posterior distribution. See \code{details}.}
+\item{b_fix}{A numeric value to set the parameter \eqn{b} in the model. If \code{NULL} (default), the parameter \eqn{b} is assigned a prior distribution. See \code{details}.}
 
-\item{d_0_b}{Hyperparameter in the distribution of \eqn{b}. See \code{details}.}
+\item{d_0_b}{Hyperparameter in the prior distribution of \eqn{b}. See \code{details}.}
 
-\item{d_1_b}{Hyperparameter in the distribution of \eqn{b}. See \code{details}.}
+\item{d_1_b}{Hyperparameter in the prior distribution of \eqn{b}. See \code{details}.}
 
-\item{eta}{Parameter controlling the transition in the chain of \eqn{b}.}
+\item{eta}{Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for \eqn{b}.}
 
-\item{d_0_z}{Hyperparameter in the distribution of the variance for the latent variables. See \code{details}.}
+\item{d_0_z}{Hyperparameter in the prior distribution of the variance for the latent variables. See \code{details}.}
 
-\item{d_1_z}{Hyperparameter in the distribution of the variance for the latent variables. See \code{details}.}
+\item{d_1_z}{Hyperparameter in the prior distribution of the variance for the latent variables. See \code{details}.}
 
-\item{kappa}{Parameter controlling the transition in the variance of latent variables.}
+\item{kappa}{Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for the variance of latent variables.}
 
-\item{delta}{Parameter controlling the transition in the correlation of latent variables.}
+\item{delta}{Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for the correlation of latent variables.}
 
-\item{d_0_mu}{Hyperparameter in the distribution of the variance within each cluster. See \code{details}.}
+\item{d_0_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
 
-\item{d_1_mu}{Hyperparameter in the distribution of the variance within each cluster. See \code{details}.}
+\item{d_1_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
 
 \item{sampling_prob}{vector with the sampling probabilities \eqn{\pi_i} for each individual in case that the data come from a complex survey sample. By default \eqn{\pi_i=1}.}
 
-\item{expansion_f}{vector with the sampling design weights or expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}.}
+\item{expansion_f}{vector with the sampling design weights or expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}}
 
 \item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
 }
 \value{
-\code{cluster} returns a S3 object of class "MIXcluster".
+\code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
 
 The generic methods \code{\link{summary}} and \code{\link{plot}} are defined for this class.
 
@@ -86,17 +86,26 @@ Model based clustering for mixed scale variables
 \details{
 The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables.
 
-The clustering mechanism is based in a Poisson-Dirichlet (\eqn{P-D}) process over the location parameter \eqn{\mu_i ; i=1,...,n} of the asociated latent variables.
+The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the asociated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 
-The parameters \eqn{a} and \eqn{b} in the model define the \eqn{P-D} process and therefore control the number of groups. These parameters can be fixed, resulting in a larger/smaller number of groups.
+The parameters \eqn{a} and \eqn{b} in the model define the \eqn{P-D} process and therefore control the number of groups. These parameters can be fixed, resulting in a larger/smaller number of groups if assigned a larger/smaller value, respectively.
 
-There are 9 hyperparameters that characterize the prior distributions of the parameters in the model: \code{alpha}, \code{d_0_a}, \code{d_1_a}, \code{d_0_b}, \code{d_1_b}, \code{d_0_z}, \code{d_1_z}, \code{d_0_mu}, \code{d_1_mu}.
+There are 9 hyperparameters that characterize the prior distributions of some parameters in the model:
+\itemize{
+    \item \eqn{f(a)=alpha*I(a=0)+(1-alpha)*dgamma(a|d_0_a, d_1_a)}
+    \item \eqn{f(b|a)=dgamma(b+a|d_0_b, d_1_b)}
+    \item \eqn{sigma^2 ~ inverse-gamma(d_0_z, d_1_z)}
+    \item \eqn{sigma^2_mu ~ inverse-gamma(d_0_mu, d_1_mu)}
+}
+
 The definition of these values also affect the number of resulting clusters since they affect the variance implied in the model.
-For example, increasing the value of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 
-The parameters \code{eta}, \code{kappa}, \code{delta} are implemented for controling the distance of the transition for the new \emph{proposed values} for the parameters \eqn{b}, \eqn{\Lambda_jj} (variance of latents) and \eqn{\Omega_ij} (correlation of latents).
+For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
+
+The parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_jj} (variance of latents) and \eqn{\Omega_ij} (correlation of latents).
+
 These parameters are not recomended to be changed ( functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij} not exported ).
 }
 \examples{
@@ -141,7 +150,7 @@ plot(x=jitter(sim.cluster.data$cluster),
 
 
 ##### Testing "MIXclustering" function with poverty.data #####
-# Using entity 15 (Estado de Mexico) #
+# Using entity 15 (Edomex) #
 
 \dontrun{
 Y_names <- c("ict_norm",

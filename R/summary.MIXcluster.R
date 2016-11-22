@@ -8,6 +8,9 @@
 #' @param object an object of class "\code{MIXcluster}"
 #' @param ...	further arguments passed to or from other methods.
 #'
+#' @seealso
+#' \code{\link{MIXclustering}}
+#'
 #' @export
 
 summary.MIXcluster <- function(object,...){

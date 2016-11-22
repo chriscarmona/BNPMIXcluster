@@ -23,10 +23,11 @@
 #' }
 #'
 #' @references
-#' Carmona C., Nieto-Barajas L., Canale A. (2016). \emph{Model based approach for household clustering with mixed scale variables.}
+#' Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 #'
 #' @importFrom stats rbinom
 #'
+#' @keywords internal
 
 sampling_a <- function( n=1, a.ini,
                         b, alpha, d_0_a, d_1_a,

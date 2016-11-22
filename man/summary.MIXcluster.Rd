@@ -14,4 +14,7 @@
 \description{
 \code{summary} method for class "\code{MIXcluster}".
 }
+\seealso{
+\code{\link{MIXclustering}}
+}
 

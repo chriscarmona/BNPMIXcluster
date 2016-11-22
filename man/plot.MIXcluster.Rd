@@ -32,6 +32,6 @@
 Plotting method for objects inheriting from class "\code{MIXcluster}".
 }
 \seealso{
-\code{\link{cluster}}
+\code{\link{MIXclustering}}
 }
 
