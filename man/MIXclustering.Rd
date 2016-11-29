@@ -20,7 +20,7 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
 
-\item{n.iter_out}{Number of efective iterations in the MCMC procedure for clustering.}
+\item{n.iter_out}{Number of effective iterations in the MCMC procedure for clustering.}
 
 \item{n.burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
@@ -56,7 +56,7 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 
 \item{sampling_prob}{vector with the sampling probabilities \eqn{\pi_i} for each individual in case that the data come from a complex survey sample. By default \eqn{\pi_i=1}.}
 
-\item{expansion_f}{vector with the sampling design weights or expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}}
+\item{expansion_f}{vector with the expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}.}
 
 \item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
 }
@@ -75,26 +75,51 @@ An object of class "MIXcluster" is a list containing the following components:
     \item{\code{Y.p}}{number of variables in the data.}
     \item{\code{MC.clusters}}{matrix with the cluster allocation for each each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
-    \item{\code{MC.values}}{a list with the simmulated values of the chainf for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
+    \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
     \item{\code{call}}{the matched call.}
 }
 }
 \description{
-Model based clustering for mixed scale variables
+\code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities.
 }
 \details{
-The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables.
-
-The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the asociated latent variables.
+The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the asociated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 
-The parameters \eqn{a} and \eqn{b} in the model define the \eqn{P-D} process and therefore control the number of groups. These parameters can be fixed, resulting in a larger/smaller number of groups if assigned a larger/smaller value, respectively.
+A full description of the model is in the article titled "\emph{Model based approach for household clustering with mixed scale variables}". See \code{Reference}.
 
-There are 9 hyperparameters that characterize the prior distributions of some parameters in the model:
+The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i= {y_ij , j = 1...,p}} and \eqn{i = 1,...,n}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
+
+For each response \eqn{y_i} of dimension \eqn{p} a corresponding latent vector \eqn{z_i} of dimension \eqn{q} is created, according to the following:
 \itemize{
-    \item \eqn{f(a)=alpha*I(a=0)+(1-alpha)*dgamma(a|d_0_a, d_1_a)}
+   \item For each continuous variable \eqn{y_ij ; j=1,...,c} the algorithm uses a latent with the same values \eqn{z_ij=y_ij}.
+   \item For each ordinal variable \eqn{y_ij, j = c+1,...,c+o}, with \eqn{K_j} different ordered values, the algorithm creates one latent \eqn{z_ij}, that allows to map the categories into continuous values divided by thresholds. For example, for a binary \eqn{y_i}, we have \eqn{y_i=0 iff z_i<0} and \eqn{y_i=1 iff z_i>0}
+   \item For each nominal variable \eqn{y_ij, j = c+o+1,...,c+o+m}, with \eqn{L_j} categories, the algorithm require \eqn{L_j-1} latent variables, whose relative order is consistent with the observed category.
+   }
+
+The data may come from a complex survey sample where each individual \eqn{y_i} has known sampling probability \eqn{\pi_i, i = 1,...,n}. The reciprocal of these sampling probabilities, \eqn{w_i=1/\pi_i}, are called expansion factors or sampling design weights.
+
+The joint model for the latent vector is therefore:
+
+\eqn{ (z_i | \mu_i,\Sigma) ~ N_q(\mu_i, \pi_i \Sigma )}
+
+The clustering model will be based in an appropriate choice of the prior distribution on the \eqn{\mu_i}'s. A clustering of the \eqn{\mu_i}'s will induce a clustering of the \eqn{y_i}'s. Our prior on the \eqn{\mu_i}'s will be:
+
+\eqn{\mu_i | G~G}, iid for \eqn{i=1,...,n}
+
+Where \eqn{G ~ PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centring measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
+
+In consequence, this choice of prior implies that the \eqn{\mu_i}'s are exchangeable with marginal distribution \eqn{\mu_i~G_0} for all \eqn{i=1,...,n}.
+
+In our case, \eqn{G(\mu)=N(0,\Sigma)}, where \eqn{\Sigma = diag( \sigma^2 ,...,\sigma^2 )}.
+
+The parameters \eqn{a} and \eqn{b} in the model define the \eqn{PD} process and therefore control the number of groups. These parameters can be fixed, resulting in a larger/smaller number of groups if assigned a larger/smaller value, respectively.
+
+There are 9 hyperparameters in the function that also characterize the prior distributions in the model:
+\itemize{
+    \item \eqn{f(a)=\alpha*I(a=0)+(1-alpha)*dgamma(a|d_0_a, d_1_a)}
     \item \eqn{f(b|a)=dgamma(b+a|d_0_b, d_1_b)}
     \item \eqn{sigma^2 ~ inverse-gamma(d_0_z, d_1_z)}
     \item \eqn{sigma^2_mu ~ inverse-gamma(d_0_mu, d_1_mu)}
@@ -104,16 +129,16 @@ The definition of these values also affect the number of resulting clusters sinc
 
 For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 
-The parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_jj} (variance of latents) and \eqn{\Omega_ij} (correlation of latents).
+Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_jj} (variance of latents) and \eqn{\Omega_ij} (correlation of latents).
 
 These parameters are not recomended to be changed ( functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij} not exported ).
 }
 \examples{
-# Clustering simulated data in "sim.cluster.data" #
-# for more information about the data:
-\dontrun{ help(sim.cluster.data) }
 
-# exercise using 1 continuous, 1 nominal and 1 ordinal variables
+##### Testing "MIXclustering" function with sim.cluster.data #####
+# using 1 continuous, 1 nominal and 1 ordinal variables
+# for more information about the data...
+\dontrun{ help(sim.cluster.data) }
 
 Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
 colnames(Y_data) <- paste("Y",1:3,sep=".")
@@ -122,12 +147,12 @@ Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )
 Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )
 
 set.seed(12345) # for reproducibility
-
+\dontrun{
 cluster_estim <- MIXclustering( Y_data,
                           var_type=c("c","m","o"),
                           n.iter_out=100, # less than the default=1000 (faster example)
                           n.burn=20, # less than the default=50
-                          n.thin=3,
+                          n.thin=3
                           )
 
 cluster_estim
@@ -146,7 +171,7 @@ plot(x=jitter(sim.cluster.data$cluster),
      xlab="Real cluster",
      ylab="Model cluster",
      pch=19, col="#FF000020")
-
+}
 
 
 ##### Testing "MIXclustering" function with poverty.data #####
@@ -169,9 +194,10 @@ poverty_cluster_estim <- MIXclustering(x=poverty.data[aux_subset,Y_names],
                                        n.thin=3
                                        )
 }
+
 }
 \references{
-Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
+Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2016). \emph{Model based approach for household clustering with mixed scale variables.} Preprint.
 }
 \seealso{
 \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
