@@ -80,6 +80,8 @@ poverty.data <- aggregate(agg_form,FUN="max",data=coneval.poverty.data)
 
 }
 
-
+}
+\seealso{
+\code{\link{MIXclustering}}
 }
 

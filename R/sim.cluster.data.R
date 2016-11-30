@@ -94,5 +94,8 @@
 #' colnames(sim.cluster.data.Z) <- paste("Z",1:ncol(sim.cluster.data.Z),sep="")
 #' sim.cluster.data <- cbind(sim.cluster.data,sim.cluster.data.Z)
 #'
+#' @seealso
+#' \code{\link{MIXclustering}}
+#'
 
 NULL

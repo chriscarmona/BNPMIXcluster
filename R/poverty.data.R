@@ -85,6 +85,7 @@
 #'
 #' }
 #'
+#' @seealso
+#' \code{\link{MIXclustering}}
 #'
-
 NULL

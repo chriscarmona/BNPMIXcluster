@@ -2,7 +2,7 @@
 % Please edit documentation in R/MIXclustering.R
 \name{MIXclustering}
 \alias{MIXclustering}
-\title{Model based clustering for mixed scale variables.}
+\title{Bayesian Nonparametric Model for Clustering with Mixed Scale Variables}
 \usage{
 MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
@@ -90,46 +90,46 @@ Computational inference about the cluster allocation and the posterior distribut
 
 A full description of the model is in the article titled "\emph{Model based approach for household clustering with mixed scale variables}". See \code{Reference}.
 
-The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i= {y_ij , j = 1...,p}} and \eqn{i = 1,...,n}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
+The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
 
-For each response \eqn{y_i} of dimension \eqn{p} a corresponding latent vector \eqn{z_i} of dimension \eqn{q} is created, according to the following:
+For each response \eqn{y_i=(y_{i,1},...,y_{i,p})} (of dimension \eqn{p}) a corresponding latent vector \eqn{z_i=(z_{i,1},...,z_{i,q})} (of dimension \eqn{q}) is created, according to the following:
 \itemize{
-   \item For each continuous variable \eqn{y_ij ; j=1,...,c} the algorithm uses a latent with the same values \eqn{z_ij=y_ij}.
-   \item For each ordinal variable \eqn{y_ij, j = c+1,...,c+o}, with \eqn{K_j} different ordered values, the algorithm creates one latent \eqn{z_ij}, that allows to map the categories into continuous values divided by thresholds. For example, for a binary \eqn{y_i}, we have \eqn{y_i=0 iff z_i<0} and \eqn{y_i=1 iff z_i>0}
-   \item For each nominal variable \eqn{y_ij, j = c+o+1,...,c+o+m}, with \eqn{L_j} categories, the algorithm require \eqn{L_j-1} latent variables, whose relative order is consistent with the observed category.
+   \item For each continuous variable \eqn{y_{i,j} ; j=1,...,c} the algorithm uses a latent with the same values \eqn{z_{i,j}=y_{i,j}}.
+   \item For each ordinal variable \eqn{y_{i,j} , j = c+1,...,c+o}, with \eqn{K_j} different ordered values, the algorithm creates one latent \eqn{z_{i,j}}, that allows to map the categories into continuous values divided by thresholds. For example, for a binary \eqn{y_j}, we have \eqn{y_j=0} iff \eqn{z_j<0} and \eqn{y_j=1} iff \eqn{z_j>0}
+   \item For each nominal variable \eqn{y_{i,j} , j = c+o+1,...,c+o+m}, with \eqn{L_j} categories, the algorithm require \eqn{L_j-1} latent variables, whose relative order is consistent with the observed category.
    }
 
 The data may come from a complex survey sample where each individual \eqn{y_i} has known sampling probability \eqn{\pi_i, i = 1,...,n}. The reciprocal of these sampling probabilities, \eqn{w_i=1/\pi_i}, are called expansion factors or sampling design weights.
 
 The joint model for the latent vector is therefore:
 
-\eqn{ (z_i | \mu_i,\Sigma) ~ N_q(\mu_i, \pi_i \Sigma )}
+\eqn{(z_i | \mu_i,\Sigma)} ~ \eqn{N_q(\mu_i, \pi_i \Sigma )}
 
 The clustering model will be based in an appropriate choice of the prior distribution on the \eqn{\mu_i}'s. A clustering of the \eqn{\mu_i}'s will induce a clustering of the \eqn{y_i}'s. Our prior on the \eqn{\mu_i}'s will be:
 
-\eqn{\mu_i | G~G}, iid for \eqn{i=1,...,n}
+\eqn{\mu_i | G}~\eqn{G}, iid for \eqn{i=1,...,n}
 
-Where \eqn{G ~ PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centring measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
+Where \eqn{G}~\eqn{PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centring measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
 
-In consequence, this choice of prior implies that the \eqn{\mu_i}'s are exchangeable with marginal distribution \eqn{\mu_i~G_0} for all \eqn{i=1,...,n}.
+In consequence, this choice of prior implies that the \eqn{\mu_i}'s are exchangeable with marginal distribution \eqn{\mu_i}~\eqn{G_0} for all \eqn{i=1,...,n}.
 
-In our case, \eqn{G(\mu)=N(0,\Sigma)}, where \eqn{\Sigma = diag( \sigma^2 ,...,\sigma^2 )}.
+In our case, \eqn{G(\mu)=N(0,\Sigma_\mu)}, where \eqn{\Sigma_\mu = diag( \sigma^2_{\mu 1} ,...,\sigma^2_{\mu q} )}.
 
 The parameters \eqn{a} and \eqn{b} in the model define the \eqn{PD} process and therefore control the number of groups. These parameters can be fixed, resulting in a larger/smaller number of groups if assigned a larger/smaller value, respectively.
 
 There are 9 hyperparameters in the function that also characterize the prior distributions in the model:
 \itemize{
-    \item \eqn{f(a)=\alpha*I(a=0)+(1-alpha)*dgamma(a|d_0_a, d_1_a)}
-    \item \eqn{f(b|a)=dgamma(b+a|d_0_b, d_1_b)}
-    \item \eqn{sigma^2 ~ inverse-gamma(d_0_z, d_1_z)}
-    \item \eqn{sigma^2_mu ~ inverse-gamma(d_0_mu, d_1_mu)}
+    \item f(a) = alpha * I(a=0) + (1-alpha) * dbeta( a | d_0_a , d_0_a )
+    \item f(b|a) = dgamma( b + a | d_0_b , d_1_b )
+    \item sigma^2 ~ inverse-gamma( d_0_z , d_1_z)
+    \item sigma^2_mu ~ inverse-gamma( d_0_mu , d_1_mu )
 }
 
 The definition of these values also affect the number of resulting clusters since they affect the variance implied in the model.
 
 For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 
-Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_jj} (variance of latents) and \eqn{\Omega_ij} (correlation of latents).
+Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents).
 
 These parameters are not recomended to be changed ( functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij} not exported ).
 }
