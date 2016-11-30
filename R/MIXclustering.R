@@ -64,6 +64,8 @@
 #'
 #' \eqn{(z_i | \mu_i,\Sigma)} ~ \eqn{N_q(\mu_i, \pi_i \Sigma )}
 #'
+#' (Note: the final model in Carmona et al. (2016) has variance \eqn{\kappa \pi_i \Sigma}. This value of \eqn{\kappa} can be used in the package through a transformed sampling probability vector \eqn{\pi_i^*=\kappa\pi_i})
+#'
 #' The clustering model will be based in an appropriate choice of the prior distribution on the \eqn{\mu_i}'s. A clustering of the \eqn{\mu_i}'s will induce a clustering of the \eqn{y_i}'s. Our prior on the \eqn{\mu_i}'s will be:
 #'
 #' \eqn{\mu_i | G}~\eqn{G}, iid for \eqn{i=1,...,n}
@@ -79,7 +81,7 @@
 #' There are 9 hyperparameters in the function that also characterize the prior distributions in the model:
 #' \itemize{
 #'     \item f(a) = alpha * I(a=0) + (1-alpha) * dbeta( a | d_0_a , d_0_a )
-#'     \item f(b|a) = dgamma( b + a | d_0_b , d_1_b )
+#'     \item f(b | a) = dgamma( b + a | d_0_b , d_1_b )
 #'     \item sigma^2 ~ inverse-gamma( d_0_z , d_1_z)
 #'     \item sigma^2_mu ~ inverse-gamma( d_0_mu , d_1_mu )
 #' }
@@ -88,9 +90,7 @@
 #'
 #' For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 #'
-#' Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents).
-#'
-#' These parameters are not recomended to be changed ( functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij} not exported ).
+#' Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents). These parameters are not recomended to be changed (used in the internal functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij}).
 #'
 #' @return
 #' \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
