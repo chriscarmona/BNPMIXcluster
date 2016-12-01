@@ -44,14 +44,14 @@ plot.MIXcluster <- function(x,
   if( is.element("chain",type) ) {
 
     plot_mcmc <- function(x,...){
-      #op <- par()
+      op <- par()
       hist_n <- hist(x,plot=F)
       layout(matrix(1:2,nrow=1,ncol=2),widths=c(4/5,1/5))
       par(mar=c(4,4,2,0.25))
       plot( x,type="l",lwd=2,col="darkblue",...); abline(h=0,col="grey70")
       par(mar=c(4,0.25,2,2))
       barplot( hist_n$counts,axes=F,space=0,xlim=c(0,max(hist_n$counts)),horiz=T)
-      #par(op)
+      suppressWarnings(par(op))
     }
 
     if( (is.element("all",chain.obj)|is.element("n.cluster",chain.obj)) ) {

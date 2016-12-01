@@ -24,15 +24,15 @@ Poverty indicators observed in Mexico for 2014.
     \item{\code{proyecto}}{ Data source identifier (1=MCS, 2=ENIGH) }
     \item{\code{folioviv}}{ Household identifier level 1 }
     \item{\code{foliohog}}{ Household identifier level 2 }
-    \item{\code{ict_norm}}{(continuous) Total income in the household.}
-    \item{\code{ic_ali}}{(binary) Deprivation indicator for access to feeding }
-    \item{\code{ic_asalud}}{(binary) Deprivation indicator for access to health services }
-    \item{\code{ic_cv}}{(binary) Deprivation indicator for access to basic public services }
-    \item{\code{ic_rezedu}}{(binary) Deprivation indicator for education }
-    \item{\code{ic_sbv}}{(binary) Deprivation indicator for housing quality }
-    \item{\code{ic_segsoc}}{(binary) Deprivation indicator for access to social security }
-    \item{\code{niv_ed}}{(categorical, ordered) Maximum educational level in the household }
-    \item{\code{tam_loc}}{(categorical, ordered) Size of locality {1,2,3,4}, according to the number of people living there. }
+    \item{\code{ict_norm}}{(continuous) Total income in the household (in mexican pesos).}
+    \item{\code{ic_ali}}{(binary) Indicator for deprivation to feeding: 1-yes,0-no }
+    \item{\code{ic_asalud}}{(binary) Indicator for deprivation to health services: 1-yes,0-no }
+    \item{\code{ic_cv}}{(binary) Housing quality: 1-bad, 0-good }
+    \item{\code{ic_rezedu}}{(binary) Indicator for education backwardness: 1-yes,0-no }
+    \item{\code{ic_sbv}}{(binary) Indicator for deprivation to basic public services: 1-yes,0-no }
+    \item{\code{ic_segsoc}}{(binary) Indicator for deprivation to social security: 1-yes,0-no }
+    \item{\code{niv_ed}}{(categorical, ordered) Maximum educational level in the household: 0-incomplete primary: 1-incomplete secondary, 2-complete secondary or more }
+    \item{\code{tam_loc}}{(categorical, nominal) Size of locality according to the number of people living there: 1-(100000, \eqn{\infty}), 2-[15000, 100000), 3-[2500, 15000), 4-[0, 2500)}
     \item{\code{factor_hog}}{Expansion factor for the household, according to the complex survey design.}
 }
 }

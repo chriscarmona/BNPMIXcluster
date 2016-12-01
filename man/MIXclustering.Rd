@@ -15,7 +15,7 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 
 \item{var_type}{Character vector that indicates the type of variable in each column of x. Three possible types:
 \itemize{
-  \item "\strong{c}" for continuous variables.
+  \item "\strong{c}" for continuous variables. It is assumed to be Gaussian-shaped.
   \item "\strong{o}" for ordinal variables (binary and ordered categorical).
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
@@ -81,10 +81,10 @@ An object of class "MIXcluster" is a list containing the following components:
 }
 }
 \description{
-\code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities.
+\code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
 }
 \details{
-The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the asociated latent variables.
+The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 
@@ -135,42 +135,107 @@ Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuni
 }
 \examples{
 
-##### Testing "MIXclustering" function with sim.cluster.data #####
-# using 1 continuous, 1 nominal and 1 ordinal variables
+##### Testing "MIXclustering" function with simulated clustered data #####
 # for more information about the data...
-\dontrun{ help(sim.cluster.data) }
-
-Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
-colnames(Y_data) <- paste("Y",1:3,sep=".")
-Y_data[,1] <- sim.cluster.data[,2]
-Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )
-Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )
-
-set.seed(12345) # for reproducibility
 \dontrun{
-cluster_estim <- MIXclustering( Y_data,
-                          var_type=c("c","m","o"),
-                          n.iter_out=100, # less than the default=1000 (faster example)
-                          n.burn=20, # less than the default=50
-                          n.thin=3
-                          )
+help(sim.cluster.data)
+}
 
-cluster_estim
+
+### Exercise (Ic) from section 5.1 in Carmona et al. (2016)
+### using 3 continuous variables
+\dontrun{
+set.seed(0) # for reproducibility
+
+Y_data <- sim.cluster.data[,2:4]
+colnames(Y_data) <- paste("Y",1:3,sep=".")
+
+cluster_estim_Ic <- MIXclustering( Y_data,
+                          var_type=c("c","c","c"),
+                          n.iter_out=1000, #
+                          n.burn=200,
+                          n.thin=2,
+                          alpha=0.5,
+                          d_0_a = 1, d_1_a = 1,
+                          d_0_b = 1, d_1_b = 1,
+                          d_0_z = 2.1, d_1_z = 30,
+                          d_0_mu = 2.1, d_1_mu = 30
+                          )
+cluster_estim_Ic
 
 # Summary of clustering results
-summary(cluster_estim)
+summary(cluster_estim_Ic)
 
 # Grafical representation of clustering results
-plot(cluster_estim,type="heatmap")
-plot(cluster_estim,type="chain",chain.obj="all")
+plot(cluster_estim_Ic,type="heatmap")
+plot(cluster_estim_Ic,type="chain")
 
 # Comparison with the original clusters in the simulated data
 plot(x=jitter(sim.cluster.data$cluster),
-     y=jitter(cluster_estim$cluster),
+     y=jitter(cluster_estim_Ic$cluster),
      main="",
      xlab="Real cluster",
      ylab="Model cluster",
      pch=19, col="#FF000020")
+}
+
+
+### Exercise (IIb) from section 5.1 in Carmona et al. (2016)
+### Two binary and one continuous variables
+\dontrun{
+set.seed(0) # for reproducibility
+
+Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
+colnames(Y_data) <- paste("Y",1:3,sep=".")
+Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
+Y_data[,2] <- sim.cluster.data[,3]
+Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
+
+cluster_estim_IIb <- MIXclustering( Y_data,
+                          var_type=c("o","c","o"),
+                          n.iter_out=1000,
+                          n.burn=200,
+                          n.thin=2,
+                          alpha=0.5,
+                          d_0_a = 1, d_1_a = 1,
+                          d_0_b = 1, d_1_b = 1,
+                          d_0_z = 1, d_1_z = 1,
+                          d_0_mu = 1, d_1_mu = 1
+                          )
+
+summary(cluster_estim_IIb)
+plot(cluster_estim_IIb,type="heatmap")
+plot(cluster_estim_IIb,type="chain")
+}
+
+
+### Exercise (IIIa) from section 5.1 in Carmona et al. (2016)
+### Two binary, one ordinal, and one (non-informative) continuous variables
+\dontrun{
+set.seed(0) # for reproducibility
+
+Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=4)
+colnames(Y_data) <- paste("Y",1:4,sep=".")
+Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
+Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )-1
+Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
+Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
+
+cluster_estim_IIIa <- MIXclustering( Y_data,
+                          var_type=c("o","o","o","c"),
+                          n.iter_out=1000,
+                          n.burn=200,
+                          n.thin=2,
+                          alpha=0.5,
+                          d_0_a = 1, d_1_a = 1,
+                          d_0_b = 1, d_1_b = 1,
+                          d_0_z = 0.1, d_1_z = 0.1,
+                          d_0_mu = 0.1, d_1_mu = 0.1
+                          )
+
+summary(cluster_estim_IIIa)
+plot(cluster_estim_IIIa,type="heatmap")
+plot(cluster_estim_IIIa,type="chain")
 }
 
 
@@ -185,14 +250,26 @@ Y_names <- c("ict_norm",
 aux_subset <- rep(T,nrow(poverty.data))
 aux_subset <- aux_subset & is.element(substr(poverty.data$folioviv,1,2),"15")
 
-poverty_cluster_estim <- MIXclustering(x=poverty.data[aux_subset,Y_names],
-                                       var_type=c("c","o","o","o","o","o","o","m","m"),
-                                       expansion_f = poverty.data[aux_subset,"factor_hog"],
+Y_data <- poverty.data[aux_subset,Y_names]
 
-                                       n.iter_out=1000,
-                                       n.burn=100,
-                                       n.thin=3
-                                       )
+sampling_prob_pov_iii <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
+sampling_prob_pov_iii <- sampling_prob_pov_iii * 1/poverty.data[aux_subset,"factor_hog"]
+
+cluster_estim_pov_iii <- MIXclustering(x=Y_data,
+                             var_type=c("c","o","o","o","o","o","o","m","m"),
+                             n.iter_out=1000,
+                             n.burn=200,
+                             n.thin=2,
+                             d_0_a = 1, d_1_a = 1,
+                             d_0_b = 1, d_1_b = 1,
+                             d_0_z = 2.1, d_1_z = 30,
+                             d_0_mu = 2.1, d_1_mu = 30
+                             sampling_prob = sampling_prob_pov_iii
+                             )
+
+summary(cluster_estim_pov_iii)
+plot(cluster_estim_pov_iii,type="heatmap")
+plot(cluster_estim_pov_iii,type="chain")
 }
 
 }
