@@ -80,3 +80,5 @@ sampling_b <- function( n_sim_mh=1, b_ini,
     return( b_chain[(n.burn+2):length(b_chain)] )
   }
 }
+
+sampling_b <- compiler::cmpfun(sampling_b)

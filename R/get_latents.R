@@ -399,3 +399,5 @@ get_latents <- function( Y,
 
   return( latents_data )
 }
+
+get_latents <- compiler::cmpfun(get_latents)

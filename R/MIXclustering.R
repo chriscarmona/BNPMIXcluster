@@ -388,7 +388,7 @@ MIXclustering <- function( x,
   # number of categories in each Ordinal variable
   K_o <- latents_info$K_o
 
-  rm(latents_info)#; gc()
+  #rm(latents_info)#; gc()
 
 
   ##### Missing data #####
@@ -590,10 +590,7 @@ MIXclustering <- function( x,
     mu_star_map <- mu_star_map_new - cumsum(aux_no_map)[mu_star_map_new]
     mu_star_n_r <- mu_star_n_r_new[!aux_no_map]
 
-    rm(mu_star_new,mu_star_map_new,mu_star_n_r_new,mu_star_n_r_temp,
-       v_i,u_i,D_0,D_values,prob_0,prob_values,aux_no_map,
-       r,r_i,mu_class,
-       i)#; gc()
+    #rm(mu_star_new,mu_star_map_new,mu_star_n_r_new,mu_star_n_r_temp,v_i,u_i,D_0,D_values,prob_0,prob_values,aux_no_map,r,r_i,mu_class,i)#; gc()
     if(dev_verbose) {
       cat('...Done! \n')
     }
@@ -625,7 +622,7 @@ MIXclustering <- function( x,
           }
         }
         v_i_star <- solve(v_i_star)
-        rm(k)
+        #rm(k)
       }
       weighted_z <- apply( matrix(1/sampling_prob[I_j],nrow=sum(I_j),ncol=n_q,byrow=F) * matrix(Z[I_j,],nrow=sum(I_j),ncol=n_q), 2, sum )
       weighted_z <- matrix(weighted_z,nrow=n_q,ncol=1)
@@ -640,10 +637,7 @@ MIXclustering <- function( x,
     # Replaces new simulated values of mu_star
     mu_star <- mu_star_new
 
-    rm(mu_star_new,
-       v_i_star,weighted_z,u_i_star,
-       I_j,sigma_mu_inv,sigma_Z_inv,
-       j)#; gc()
+    #rm(mu_star_new,v_i_star,weighted_z,u_i_star,I_j,sigma_mu_inv,sigma_Z_inv,j)#; gc()
 
 
     ### (c) Sampling "sigma_mu" ###
@@ -661,7 +655,7 @@ MIXclustering <- function( x,
       sigma_mu_new[j,j] <- 1/rgamma( n=1, shape=shape_gamma, rate=rate_gamma )
     }
     sigma_mu <- sigma_mu_new
-    rm(shape_gamma,rate_gamma)#; gc()
+    #rm(shape_gamma,rate_gamma)#; gc()
     if(dev_verbose) {
       cat('...Done! \n')
     }
@@ -715,10 +709,10 @@ MIXclustering <- function( x,
         cat("*****\nProcess finished because 'sigma_Z_new' is not positive definite!\n*****");
         return()
       }
-      rm(aux_Lambda)
+      #rm(aux_Lambda)
     }
 
-    rm(j_sigma)#; gc()
+    #rm(j_sigma)#; gc()
 
     if(dev_verbose) {
       cat('...Done! \n')
@@ -764,7 +758,7 @@ MIXclustering <- function( x,
 
       }
     }
-    rm(i_omega,j_omega,aux_omega_ij_new,omega_ij_new)#;gc()
+    #rm(i_omega,j_omega,aux_omega_ij_new,omega_ij_new)#;gc()
 
     # updates 'sigma_Z' after all element in 'Omega' are sampled
     # only once because 'Omega' sampling IS NOT dependent of 'sigma_Z'
@@ -793,7 +787,7 @@ MIXclustering <- function( x,
         rate_gamma <- d_1_z + (1/2) * sum( (1/sampling_prob) * ( Z[,j] - mu_star[mu_star_map,j] )^2 )
         Lambda_new[j,j] <- 1/rgamma(n=1,shape=shape_gamma,rate=rate_gamma)
       }
-      rm(shape_gamma,rate_gamma)#; gc()
+      #rm(shape_gamma,rate_gamma)#; gc()
 
       diag(Lambda_new)[aux_var1_Z] <- 1
       #rm(aux_var1_Z)
@@ -907,7 +901,7 @@ MIXclustering <- function( x,
 
     pb$step()
 
-    rm(list=setdiff(ls(),lsa_iter)); gc()
+    #rm(list=setdiff(ls(),lsa_iter)); gc()
   }
 
   #####
@@ -951,7 +945,7 @@ MIXclustering <- function( x,
     cluster_matrix_sum <- cluster_matrix_sum + cluster_matrix_i
   }
   cluster.matrix.avg <- cluster_matrix_sum/dim(clusters)[2]
-  rm(cluster_matrix_sum,iter_i,cluster_matrix_i,aux_cluster_num,cluster_j)
+  #rm(cluster_matrix_sum,iter_i,cluster_matrix_i,aux_cluster_num,cluster_j)
 
   # Distance of each cluster to the average matrix #
   cluster_dist <- rep(0,dim(clusters)[2])
@@ -970,7 +964,7 @@ MIXclustering <- function( x,
     # calculates distance to the average matrix
     cluster_dist[iter_i] <- sum((cluster_matrix_i-cluster.matrix.avg)^2)
   }
-  rm(iter_i,cluster_matrix_i,aux_cluster_num,cluster_j)
+  #rm(iter_i,cluster_matrix_i,aux_cluster_num,cluster_j)
 
   # Which cluster is closer to the average similarity matrix #
   cluster.cta <- clusters[,which.min(cluster_dist)]
@@ -1040,3 +1034,5 @@ MIXclustering <- function( x,
   return(dpclust)
 
 }
+
+#MIXclustering <- compiler::cmpfun(MIXclustering)

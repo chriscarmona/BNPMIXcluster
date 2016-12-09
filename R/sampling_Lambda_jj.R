@@ -68,3 +68,4 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
   }
 }
 
+sampling_Lambda_jj <- compiler::cmpfun(sampling_Lambda_jj)

@@ -25,3 +25,5 @@ log_f_post_Lambda_jj <- function(sigma_jj,
 
   return(log_f_post_sigma_j)
 }
+
+log_f_post_Lambda_jj <- compiler::cmpfun(log_f_post_Lambda_jj)

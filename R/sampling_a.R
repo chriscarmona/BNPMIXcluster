@@ -118,3 +118,5 @@ sampling_a <- function( n=1, a.ini,
 
   return( a.sim )
 }
+
+sampling_a <- compiler::cmpfun(sampling_a)

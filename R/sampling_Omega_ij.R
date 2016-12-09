@@ -127,3 +127,5 @@ sampling_Omega_ij <- function(n=1,Omega.ini,i,j,delta=4,
   return( omega_ij_sim )
 
 }
+
+sampling_Omega_ij <- compiler::cmpfun(sampling_Omega_ij)

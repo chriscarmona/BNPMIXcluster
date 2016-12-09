@@ -23,3 +23,5 @@ log_f_post_Omega <- function(Omega,
 
   return( log_posterior_Omega )
 }
+
+log_f_post_Omega <- compiler::cmpfun(log_f_post_Omega)
