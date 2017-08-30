@@ -1,9 +1,10 @@
 #' @importFrom stats dgamma
 sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
-                        d_0_z, d_1_z, kappa=1,
-                        Z, mu_Z, sigma_Z, sampling_prob,
-                        max.time=10*60,n.burn=0,
-                        accept_display=T, verbose=F) {
+                                d_0_z, d_1_z, kappa=1,
+                                Z, mu_Z, sigma_Z, sampling_prob,
+                                max.time=10*60,n.burn=0,
+                                accept_display=T, verbose=F,
+                                USING_CPP=TRUE) {
 
   ###     Metropolis-Hastings for variances of sigma_Z given by 'Lambda'     ###
   # MH Sampling from 'sigma_jk' #
@@ -25,21 +26,43 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
     # generate proposal "sigma_j_new"
     sigma_jj_prop <- rgamma( n=1, shape=kappa, rate=kappa/sigma_jj_chain[length(sigma_jj_chain)] )
 
-    #browser()
+    # posterior probability for the current value and proposal of a
+    if( USING_CPP ) {
+      log_f_post_sigma_jj_curr <- log_f_post_Lambda_jj_cpp( sigma_jj=sigma_jj_chain[length(sigma_jj_chain)],
+                                                            d_0_z=d_0_z,
+                                                            d_1_z=d_1_z,
+                                                            Z=Z,
+                                                            mu_Z=mu_Z,
+                                                            sigma_Z=sigma_Z,
+                                                            sampling_prob=sampling_prob)
 
-    # posterior probability for the current value of a
-    log_f_post_sigma_jj_curr <- log_f_post_Lambda_jj(sigma_jj=sigma_jj_chain[length(sigma_jj_chain)],
-                                                     d_0_z=d_0_z,d_1_z=d_1_z,
-                                                     Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, sampling_prob=sampling_prob)
+      log_f_post_sigma_jj_prop <- log_f_post_Lambda_jj_cpp( sigma_jj=sigma_jj_prop,
+                                                            d_0_z=d_0_z,
+                                                            d_1_z=d_1_z,
+                                                            Z=Z,
+                                                            mu_Z=mu_Z,
+                                                            sigma_Z=sigma_Z,
+                                                            sampling_prob=sampling_prob)
+    } else {
+      log_f_post_sigma_jj_curr <- log_f_post_Lambda_jj( sigma_jj=sigma_jj_chain[length(sigma_jj_chain)],
+                                                        d_0_z=d_0_z,
+                                                        d_1_z=d_1_z,
+                                                        Z=Z,
+                                                        mu_Z=mu_Z,
+                                                        sigma_Z=sigma_Z,
+                                                        sampling_prob=sampling_prob)
 
-    # posterior probability for the proposal value of a
-    log_f_post_sigma_jj_prop <- log_f_post_Lambda_jj(sigma_jj=sigma_jj_prop,
-                                                     d_0_z=d_0_z,d_1_z=d_1_z,
-                                                     Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, sampling_prob=sampling_prob)
-
+      log_f_post_sigma_jj_prop <- log_f_post_Lambda_jj( sigma_jj=sigma_jj_prop,
+                                                        d_0_z=d_0_z,
+                                                        d_1_z=d_1_z,
+                                                        Z=Z,
+                                                        mu_Z=mu_Z,
+                                                        sigma_Z=sigma_Z,
+                                                        sampling_prob=sampling_prob)
+    }
     log_r <- (log_f_post_sigma_jj_prop - log_f_post_sigma_jj_curr) + ( dgamma( x=sigma_jj_chain[length(sigma_jj_chain)], shape=kappa, rate=kappa/sigma_jj_prop, log=T )
-                                                                     -dgamma( x=sigma_jj_prop, shape=kappa, rate=kappa/sigma_jj_chain[length(sigma_jj_chain)], log=T )
-                                                                     )
+                                                                       -dgamma( x=sigma_jj_prop, shape=kappa, rate=kappa/sigma_jj_chain[length(sigma_jj_chain)], log=T )
+    )
     # exp(log_r)
 
     #if( runif(1,0,1) > lik_ratio ) {

@@ -28,8 +28,7 @@ Simulates values for latent variables \eqn{Z=(Z_1,...,Z_q)} according to the spe
 }
 \details{
 For each variable in the \code{Y} data frame, an associated continuos latent variable is generated.
-    if \code{var_type} is continuos, the corresponding \eqn{Z} will keep the original values of \eqn{Y}.
-    If \eqn{Y} is categorical, the function will scan the unique values of \eqn{Y} and generate continuous latent variables accordingly.
+    if \eqn{Y_j} is continuos, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
+    If \eqn{Y_j} is categorical, the function will scan the unique values of \eqn{Y_j} and generate continuous latent variables accordingly.
 }
 \keyword{internal}
-

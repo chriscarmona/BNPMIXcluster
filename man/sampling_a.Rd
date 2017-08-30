@@ -5,7 +5,7 @@
 \title{Simulation of "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.}
 \usage{
 sampling_a(n = 1, a.ini, b, alpha, d_0_a, d_1_a, mu_star_n_r, n.burn = 0,
-  n.thin = 0, max.time = Inf, verbose = F)
+  n.thin = 0, max.time = Inf, verbose = F, USING_CPP = TRUE)
 }
 \arguments{
 \item{n}{number of simulations to generate}
@@ -45,4 +45,3 @@ The simulation is done via Metropolis-Hastings method.
 Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 }
 \keyword{internal}
-

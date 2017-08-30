@@ -7,7 +7,7 @@ log_f_post_Lambda_jj <- function(sigma_jj,
   ###     Metropolis-Hastings for variances of sigma_Z given by 'Lambda'     ###
   # target distribution: log-posterior distribution of 'sigma_jj' #
 
-  if(all(dim(Z)==!dim(mu_Z))) {
+  if(any(dim(Z)!=dim(mu_Z))) {
     cat('\nError: Problem simulating sigma: Dimension of Z and mu_Z are not equal \n')
     stop('Problem simulating sigma: Dimension of Z and mu_Z are not equal')
   }

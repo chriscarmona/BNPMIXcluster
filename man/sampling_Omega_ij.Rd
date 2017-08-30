@@ -5,7 +5,8 @@
 \title{Simulation of "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.}
 \usage{
 sampling_Omega_ij(n = 1, Omega.ini, i, j, delta = 4, Z, mu_Z, Lambda,
-  sampling_prob, n.burn = 0, n.thin = 0, max.time = Inf, verbose = F)
+  sampling_prob, n.burn = 0, n.thin = 0, max.time = Inf, verbose = F,
+  USING_CPP = USING_CPP)
 }
 \arguments{
 \item{n}{number of simulations to be generated}
@@ -49,4 +50,3 @@ The simulation is done via Metropolis-Hastings method.
 Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 }
 \keyword{internal}
-

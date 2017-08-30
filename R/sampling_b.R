@@ -3,7 +3,8 @@ sampling_b <- function( n_sim_mh=1, b_ini,
                         a, d_0_b, d_1_b, eta=1,
                         mu_star_n_r,
                         max.time=10*60, n.burn=0,
-                        accept_display=T, verbose=F) {
+                        accept_display=T, verbose=F,
+                        USING_CPP=TRUE ) {
 
   ###     Metropolis-Hastings for 'b'     ###
   # MH Sampling from 'b' #
@@ -40,17 +41,28 @@ sampling_b <- function( n_sim_mh=1, b_ini,
     b_prop_interval <- c(max(-a,b_chain[length(b_chain)]-eta),b_chain[length(b_chain)]+eta)
     b_prop <- runif(1,b_prop_interval[1],b_prop_interval[2])
 
-    # posterior probability for the current value of b
-    log_f_post_b_curr <- log_f_post_b(b=b_chain[length(b_chain)],
-                                      a=a,
-                                      d_0_b=d_0_b,d_1_b=d_1_b,
-                                      mu_star_n_r=mu_star_n_r)
+    # posterior probability for the current and proposed value of b
+    if( USING_CPP ) {
+      log_f_post_b_curr <- log_f_post_b_cpp(b=b_chain[length(b_chain)],
+                                            a=a,
+                                            d_0_b=d_0_b,d_1_b=d_1_b,
+                                            mu_star_n_r=mu_star_n_r)
+      log_f_post_b_prop <- log_f_post_b_cpp(b=b_prop,
+                                            a=a,
+                                            d_0_b=d_0_b,d_1_b=d_1_b,
+                                            mu_star_n_r=mu_star_n_r)
+    } else {
+      log_f_post_b_curr <- log_f_post_b(b=b_chain[length(b_chain)],
+                                        a=a,
+                                        d_0_b=d_0_b,d_1_b=d_1_b,
+                                        mu_star_n_r=mu_star_n_r)
+      log_f_post_b_prop <- log_f_post_b(b=b_prop,
+                                        a=a,
+                                        d_0_b=d_0_b,d_1_b=d_1_b,
+                                        mu_star_n_r=mu_star_n_r)
+    }
 
-    # posterior probability for the proposal value of b
-    log_f_post_b_prop <- log_f_post_b(b=b_prop,
-                                      a=a,
-                                      d_0_b=d_0_b,d_1_b=d_1_b,
-                                      mu_star_n_r=mu_star_n_r)
+
 
     b_cur_interval_given_prop <- c(max(-a,b_prop-eta),b_prop+eta)
 

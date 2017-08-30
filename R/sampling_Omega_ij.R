@@ -29,11 +29,12 @@
 #'
 #' @keywords internal
 
-sampling_Omega_ij <- function(n=1,Omega.ini,i,j,delta=4,
-                           Z, mu_Z, Lambda, sampling_prob,
-                           n.burn=0,n.thin=0,
-                           max.time=Inf,
-                           verbose=F) {
+sampling_Omega_ij <- function( n=1,Omega.ini,i,j,delta=4,
+                               Z, mu_Z, Lambda, sampling_prob,
+                               n.burn=0,n.thin=0,
+                               max.time=Inf,
+                               verbose=F,
+                               USING_CPP=USING_CPP ) {
 
   ###     Metropolis-Hastings for correlations of sigma_Z given by 'Omega'     ###
   # MH Sampling from 'omega' #
@@ -91,15 +92,30 @@ sampling_Omega_ij <- function(n=1,Omega.ini,i,j,delta=4,
     Omega.prop <- Omega.ini
     Omega.prop[i,j] <- Omega.prop[j,i] <- omega_ij.prop
 
-    # posterior probability for the current value of omega
-    log_f_post_Omega <- log_f_post_Omega( Omega=Omega,
-                                          Z=Z, mu_Z=mu_Z, Lambda=Lambda,
-                                          sampling_prob=sampling_prob )
-
-    # posterior probability for the proposal value of omega
-    log_f_post_Omega.prop <- log_f_post_Omega( Omega=Omega.prop,
-                                               Z=Z, mu_Z=mu_Z, Lambda=Lambda,
-                                               sampling_prob=sampling_prob )
+    # posterior probability for the current and proposal values of omega
+    if ( USING_CPP ) {
+      log_f_post_Omega <- log_f_post_Omega_cpp( Omega=Omega,
+                                                Z=Z,
+                                                mu_Z=mu_Z,
+                                                Lambda=Lambda,
+                                                sampling_prob=sampling_prob )
+      log_f_post_Omega.prop <- log_f_post_Omega_cpp( Omega=Omega.prop,
+                                                     Z=Z,
+                                                     mu_Z=mu_Z,
+                                                     Lambda=Lambda,
+                                                     sampling_prob=sampling_prob )
+    } else {
+      log_f_post_Omega <- log_f_post_Omega( Omega=Omega,
+                                            Z=Z,
+                                            mu_Z=mu_Z,
+                                            Lambda=Lambda,
+                                            sampling_prob=sampling_prob )
+      log_f_post_Omega.prop <- log_f_post_Omega( Omega=Omega.prop,
+                                                 Z=Z,
+                                                 mu_Z=mu_Z,
+                                                 Lambda=Lambda,
+                                                 sampling_prob=sampling_prob )
+    }
 
     log_r <- log_f_post_Omega.prop - log_f_post_Omega  + ( log(1/diff(interval_last_given_prop)) - log(1/diff(interval_prop_given_last)) )
 

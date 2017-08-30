@@ -40,6 +40,7 @@
 #' @param d_1_mu Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.
 #'
 #' @param max.time Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.
+#' @param USING_CPP Indicates wheter to use optimized functions developed in C++ (TRUE default)
 #'
 #' @details
 #'
@@ -134,7 +135,7 @@
 #'
 #' cluster_estim_Ic <- MIXclustering( Y_data,
 #'                           var_type=c("c","c","c"),
-#'                           n.iter_out=1000, #
+#'                           n.iter_out=1000,
 #'                           n.burn=200,
 #'                           n.thin=2,
 #'                           alpha=0.5,
@@ -148,7 +149,7 @@
 #' # Summary of clustering results
 #' summary(cluster_estim_Ic)
 #'
-#' # Grafical representation of clustering results
+#' # Representation of clustering results
 #' plot(cluster_estim_Ic,type="heatmap")
 #' plot(cluster_estim_Ic,type="chain")
 #'
@@ -188,6 +189,7 @@
 #' summary(cluster_estim_IIb)
 #' plot(cluster_estim_IIb,type="heatmap")
 #' plot(cluster_estim_IIb,type="chain")
+#'
 #' }
 #'
 #'
@@ -218,6 +220,7 @@
 #' summary(cluster_estim_IIIa)
 #' plot(cluster_estim_IIIa,type="heatmap")
 #' plot(cluster_estim_IIIa,type="chain")
+#'
 #' }
 #'
 #'
@@ -245,7 +248,7 @@
 #'                              d_0_a = 1, d_1_a = 1,
 #'                              d_0_b = 1, d_1_b = 1,
 #'                              d_0_z = 2.1, d_1_z = 30,
-#'                              d_0_mu = 2.1, d_1_mu = 30
+#'                              d_0_mu = 2.1, d_1_mu = 30,
 #'                              sampling_prob = sampling_prob_pov_iii
 #'                              )
 #'
@@ -263,33 +266,33 @@
 #' @export
 
 MIXclustering <- function( x,
-                     var_type,
+                           var_type,
 
-                     n.iter_out=1000,
-                     n.burn=100,
-                     n.thin=3,
+                           n.iter_out=1000,
+                           n.burn=100,
+                           n.thin=3,
 
-                     a_fix=NULL,
-                     alpha=0.5,
-                     d_0_a=1, d_1_a=1,
+                           a_fix=NULL,
+                           alpha=0.5,
+                           d_0_a=1, d_1_a=1,
 
-                     b_fix=NULL,
-                     d_0_b=1, d_1_b=5,
-                     eta=2,
+                           b_fix=NULL,
+                           d_0_b=1, d_1_b=5,
+                           eta=2,
 
-                     d_0_z=2.1, d_1_z=30,
-                     kappa=5, delta=4,
+                           d_0_z=2.1, d_1_z=30,
+                           kappa=5, delta=4,
 
-                     d_0_mu=2.1, d_1_mu=30,
+                           d_0_mu=2.1, d_1_mu=30,
 
-                     sampling_prob=NULL,
-                     expansion_f=NULL,
+                           sampling_prob=NULL,
+                           expansion_f=NULL,
 
-                     max.time=Inf
-) {
+                           max.time=Inf,
+                           USING_CPP = TRUE ) {
 
 
-  dev_verbose<-F
+  dev_verbose = FALSE
 
   cl <- match.call()
 
@@ -327,10 +330,26 @@ MIXclustering <- function( x,
   n <- nrow(Y)
   p <- ncol(Y)
 
-  # number of variables by type
+  # number of variables by type #
+  # continuous latent variables
   n_c <- sum( is.element( var_type, var_type_all[1] ) )
+  # ordinal latent variables (categorical, ordered)
   n_o <- sum( is.element( var_type, var_type_all[2] ) )
+  # nominal variables (categorical, unordered)
   n_m <- sum( is.element( var_type, var_type_all[3] ) )
+  # nominal latent variables (categorical, unordered)
+  n_m_l = rep(NA,n_m)
+  if(n_m>0) {
+    for (i in 1:n_m ) {
+      # i=1
+      aux_i = which( is.element( var_type, var_type_all[3] ) )[i]
+      # k-1 latents are needed for a categorical variable with k categories
+      n_m_l[i] = length(unique(Y[,aux_i]))-1
+    }
+    rm(i,aux_i)
+  }
+  # total number of latent variables in Z
+  n_q <- n_c+n_o+sum(n_m_l)
 
   # changes the colnames of Y for simplicity and standarization
   colnames(Y) <- paste("var_",
@@ -365,31 +384,18 @@ MIXclustering <- function( x,
   }
 
   #####     Simulating latent variables 'Z' from 'Y'     #####
-  latents_info <- get_latents(Y=Y,
-                              var_type=var_type)
 
   # simulated latent variables
-  Z <- latents_info$Z
-
-  # number of continuous latent variables
-  n_c <- latents_info$n_c
-
-  # number of ordinal latent variables (categorical, ordered)
-  n_o <- latents_info$n_o
-
-  # number of nominal latent variables (categorical, unordered)
-  n_m_l <- latents_info$n_m_l
-
-  # total number of latent variables in Z
-  n_q <- n_c+n_o+sum(n_m_l)
-
-  #n_q==latents_info$n_q # TRUE
-
-  # number of categories in each Ordinal variable
-  K_o <- latents_info$K_o
-
-  #rm(latents_info)#; gc()
-
+  if (USING_CPP) {
+    Z <- get_latents_cpp( Y=as.matrix(Y),
+                          var_type = match(var_type,var_type_all),
+                          mu_Z = matrix(0,nrow=n,ncol=n_q),
+                          sigma_Z = diag(1,nrow=n_q,ncol=n_q),
+                          Z_ini = matrix(0,1,1) )
+  } else {
+    Z <- get_latents( Y=Y,
+                      var_type = var_type )
+  }
 
   ##### Missing data #####
   # Only consider rows with complete information, i.e. no missing data allowed
@@ -426,7 +432,7 @@ MIXclustering <- function( x,
   }
   if( n_m>0 ){
     # unit variance for categorical (not ordinal) variables
-    aux_var1_Z[(n_c+n_o+1):(n_c+n_o+sum(n_m_l))] <- T
+    aux_var1_Z[(n_c+n_o+1):n_q] <- T
   }
   diag(Lambda)[aux_var1_Z] <- 1
 
@@ -549,12 +555,21 @@ MIXclustering <- function( x,
       mu_star_n_r_temp[mu_star_map[i]] <- mu_star_n_r_temp[mu_star_map[i]]-1
       r_i <- sum(mu_star_n_r_temp>0)
 
-      D_0 <- ( b + a * r_i ) * mvtnorm::dmvnorm( x=Z[i,] , mean=rep(0,n_q), sigma=sampling_prob[i]*sigma_Z+sigma_mu )
-      D_values <- as.numeric(NULL)
-      for(r in 1:length(mu_star_n_r_temp)) {
-        D_values[r] <- ( mu_star_n_r_temp[r] - a ) * mvtnorm::dmvnorm( x=Z[i,] , mean=mu_star[r,], sigma=sampling_prob[i]*sigma_Z )
+      if( USING_CPP ) {
+        D_0 <- ( b + a * r_i ) * dmvnrm_arma( x=Z[i,,drop=F] , mean=rep(0,n_q), sigma=sampling_prob[i]*sigma_Z+sigma_mu )
+        D_values <- as.numeric(NULL)
+        for(r in 1:length(mu_star_n_r_temp)) {
+          D_values[r] <- ( mu_star_n_r_temp[r] - a ) * dmvnrm_arma( x=Z[i,,drop=F] , mean=mu_star[r,], sigma=sampling_prob[i]*sigma_Z )
+        }
+        D_values[D_values<0] <- 0
+      } else {
+        D_0 <- ( b + a * r_i ) * mvtnorm::dmvnorm( x=Z[i,] , mean=rep(0,n_q), sigma=sampling_prob[i]*sigma_Z+sigma_mu )
+        D_values <- as.numeric(NULL)
+        for(r in 1:length(mu_star_n_r_temp)) {
+          D_values[r] <- ( mu_star_n_r_temp[r] - a ) * mvtnorm::dmvnorm( x=Z[i,] , mean=mu_star[r,], sigma=sampling_prob[i]*sigma_Z )
+        }
+        D_values[D_values<0] <- 0
       }
-      D_values[D_values<0] <- 0
 
       if(sum( D_0, D_values )==0) {
         cat('\nError: There is a problem with "D_r" in the simulation of mu_Z \n: sum( D_0, D_values )==0\n')
@@ -687,10 +702,11 @@ MIXclustering <- function( x,
       }
 
       aux_Lambda <-  sampling_Lambda_jj( n_sim_mh=1, sigma_jj_ini=Lambda_new[j_sigma,j_sigma]^2,j=j_sigma,
-                                        d_0_z=d_0_z, d_1_z=d_1_z, kappa=kappa,
-                                        Z=Z, mu_Z=mu_star[mu_star_map,], sigma_Z=sigma_Z_new, sampling_prob=sampling_prob,
-                                        max.time=max.time,n.burn=0,
-                                        verbose=F)
+                                         d_0_z=d_0_z, d_1_z=d_1_z, kappa=kappa,
+                                         Z=Z, mu_Z=mu_star[mu_star_map,], sigma_Z=sigma_Z_new, sampling_prob=sampling_prob,
+                                         max.time=max.time,n.burn=0,
+                                         verbose=F,
+                                         USING_CPP=USING_CPP )
 
       Lambda_new[j_sigma,j_sigma] <- sqrt(aux_Lambda[[1]])
       Lambda_accept[iter_i,j_sigma] <- aux_Lambda[[2]]
@@ -735,13 +751,13 @@ MIXclustering <- function( x,
           cat('(',i_omega,',',j_omega,') ',sep='')
         }
 
-        aux_omega_ij_new <- sampling_Omega_ij(n=1,
-                                              Omega.ini=Omega_new,i=i_omega,j=j_omega,
-                                              delta=delta,
-                                              Z=Z, mu_Z=mu_star[mu_star_map,], Lambda=Lambda_new, sampling_prob=sampling_prob,
-                                              n.burn=0,n.thin=0,
-                                              max.time=max.time
-        )
+        aux_omega_ij_new <- sampling_Omega_ij( n=1,
+                                               Omega.ini=Omega_new,i=i_omega,j=j_omega,
+                                               delta=delta,
+                                               Z=Z, mu_Z=mu_star[mu_star_map,], Lambda=Lambda_new, sampling_prob=sampling_prob,
+                                               n.burn=0,n.thin=0,
+                                               max.time=max.time,
+                                               USING_CPP=USING_CPP )
 
 
         omega_ij_new <- aux_omega_ij_new[[1]]
@@ -823,7 +839,8 @@ MIXclustering <- function( x,
                                b=b, alpha=alpha, d_0_a=d_0_a, d_1_a=d_1_a,
                                mu_star_n_r=mu_star_n_r,
                                max.time=max.time, n.burn=0,
-                               verbose=F )
+                               verbose=F,
+                               USING_CPP=USING_CPP)
 
       a_new <- aux_a_new$a.chain
       a_accept <- c( a_accept , aux_a_new$accept.indic )
@@ -849,7 +866,8 @@ MIXclustering <- function( x,
                                a=a, d_0_b=d_0_b, d_1_b=d_1_b,
                                mu_star_n_r=mu_star_n_r,
                                max.time=max.time, n.burn=0, eta=eta,
-                               verbose=F )
+                               verbose=F,
+                               USING_CPP=USING_CPP )
 
       b_new <- aux_b_new[[1]]
       b_accept <- c(b_accept, aux_b_new[[2]])
@@ -870,11 +888,20 @@ MIXclustering <- function( x,
     if(dev_verbose) {
       cat( 'Sampling "Z_ij":\n' )
     }
-    Z_new <- get_latents( Y=Y,
-                          var_type=var_type,
-                          mu_Z.ini=mu_star[mu_star_map,],
-                          sigma_Z.ini=sigma_Z,
-                          Z.ini=Z )$Z
+
+    if (USING_CPP) {
+      Z_new <- get_latents_cpp( Y = as.matrix(Y),
+                                var_type = match(var_type, var_type_all),
+                                mu_Z = mu_star[mu_star_map,],
+                                sigma_Z = sigma_Z,
+                                Z_ini = Z )
+    } else {
+      Z_new <- get_latents( Y = Y,
+                            var_type = var_type,
+                            mu_Z.ini = mu_star[mu_star_map,],
+                            sigma_Z.ini = sigma_Z,
+                            Z.ini = Z )
+    }
     Z <- Z_new
 
     if(dev_verbose) {
@@ -912,8 +939,8 @@ MIXclustering <- function( x,
     # function for sorting clustering numbers
     # cluster 1 will be the one with more elements
     plyr::mapvalues(x,
-                 from=as.numeric(names(sort(table(x),decreasing=T))),
-                 to=sort(unique(x)))
+                    from=as.numeric(names(sort(table(x),decreasing=T))),
+                    to=sort(unique(x)))
   }
 
   ### iterations that will be reported ###

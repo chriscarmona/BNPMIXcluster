@@ -23,8 +23,8 @@
 #'
 #' @details
 #'     For each variable in the \code{Y} data frame, an associated continuos latent variable is generated.
-#'     if \code{var_type} is continuos, the corresponding \eqn{Z} will keep the original values of \eqn{Y}.
-#'     If \eqn{Y} is categorical, the function will scan the unique values of \eqn{Y} and generate continuous latent variables accordingly.
+#'     if \eqn{Y_j} is continuos, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
+#'     If \eqn{Y_j} is categorical, the function will scan the unique values of \eqn{Y_j} and generate continuous latent variables accordingly.
 #'
 #' @keywords internal
 
@@ -389,6 +389,8 @@ get_latents <- function( Y,
     stop("There is a problem with the simulation of latents Z")
   }
 
+  return( Z )
+
   latents_data <- list( Z=Z,
                   n_c=n_c,
                   n_o=n_o,
@@ -397,7 +399,7 @@ get_latents <- function( Y,
                   thres_o=thres_o,
                   K_o=K_o )
 
-  return( latents_data )
+  # return( latents_data )
 }
 
 get_latents <- compiler::cmpfun(get_latents)

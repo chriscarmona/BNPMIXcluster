@@ -1,22 +1,27 @@
 Package: BNPMIXcluster
 Type: Package
 Title: Bayesian Nonparametric Model for Clustering with Mixed Scale Variables
-Version: 0.2.0
+Version: 1.1.0
 Authors@R: c(person("Christian", "Carmona", role = c("aut", "cre"), email = "carmona@stats.ox.ac.uk"),
              person("Luis", "Nieto-Barajas", role = "aut", email = " lnieto@itam.mx"),
              person("Antonio", "Canale", role = "ctb", email = "antonio.canale@unito.it")
              )
 Description: Bayesian nonparametric approach for clustering that is capable to combine different types of variables (continuous, ordinal and nominal) and also accommodates for different sampling probabilities in a complex survey design. The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables. The package performs the clustering model described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) <http://arxiv.org/abs/1612.00083>.
-License: GPL
+License: GPL (>= 2)
 LazyData: TRUE
 Depends:
     R (>= 2.10)
 Imports:
+    Rcpp (>= 0.12.12),
     matrixcalc,
     truncnorm,
     mvtnorm,
     plyr,
     MASS,
     compiler
-RoxygenNote: 5.0.1
-Suggests: scatterplot3d
+LinkingTo:
+    Rcpp,
+    RcppArmadillo,
+Suggests:
+    scatterplot3d
+RoxygenNote: 6.0.1

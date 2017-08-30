@@ -34,7 +34,8 @@ sampling_a <- function( n=1, a.ini,
                         mu_star_n_r,
                         n.burn=0,n.thin=0,
                         max.time=Inf,
-                        verbose=F) {
+                        verbose=F,
+                        USING_CPP=TRUE ) {
 
   # Metropolis-Hastings for 'a' #
   # MH Sampling from 'a' #
@@ -78,12 +79,19 @@ sampling_a <- function( n=1, a.ini,
 
 
     # posterior probability for the current value of a
-    log_f_post_a <- log_f_post_a(a=a,
-                                      b=b,
-                                      alpha=alpha,
-                                      d_0_a=d_0_a,d_1_a=d_1_a,
-                                      mu_star_n_r=mu_star_n_r)
-
+    if(USING_CPP) {
+      log_f_post_a <- log_f_post_a_cpp(a=a,
+                                       b=b,
+                                       alpha=alpha,
+                                       d_0_a=d_0_a,d_1_a=d_1_a,
+                                       mu_star_n_r=mu_star_n_r)
+    } else {
+      log_f_post_a <- log_f_post_a(a=a,
+                                   b=b,
+                                   alpha=alpha,
+                                   d_0_a=d_0_a,d_1_a=d_1_a,
+                                   mu_star_n_r=mu_star_n_r)
+    }
     # posterior probability for the proposal value of a
     log_f_post_a.prop <- log_f_post_a(a=a.prop,
                                       b=b,
