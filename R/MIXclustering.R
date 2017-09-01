@@ -160,9 +160,10 @@
 #'      xlab="Real cluster",
 #'      ylab="Model cluster",
 #'      pch=19, col="#FF000020")
+#'
 #' }
-#'
-#'
+#' 
+#' 
 #' ### Exercise (IIb) from section 5.1 in Carmona et al. (2016)
 #' ### Two binary and one continuous variables
 #' \dontrun{
@@ -206,7 +207,7 @@
 #' Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
 #'
 #' cluster_estim_IIIa <- MIXclustering( Y_data,
-#'                           var_type=c("o","o","o","c"),
+#'                           var_type=c("m","o","o","c"),
 #'                           n.iter_out=1000,
 #'                           n.burn=200,
 #'                           n.thin=2,
@@ -262,7 +263,10 @@
 #'
 #' @importFrom stats aggregate as.formula cor rgamma rmultinom sd
 #' @import plyr
-#'
+#' 
+#' @useDynLib BNPMIXcluster
+#' @importFrom Rcpp sourceCpp
+#' 
 #' @export
 
 MIXclustering <- function( x,

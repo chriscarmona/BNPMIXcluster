@@ -5,6 +5,10 @@ dmvnrm_arma <- function(x, mean, sigma, logd = FALSE) {
     .Call('_BNPMIXcluster_dmvnrm_arma', PACKAGE = 'BNPMIXcluster', x, mean, sigma, logd)
 }
 
+rtn1 <- function(mean, sd, low, high) {
+    .Call('_BNPMIXcluster_rtn1', PACKAGE = 'BNPMIXcluster', mean, sd, low, high)
+}
+
 get_latents_cpp <- function(Y, var_type, mu_Z, sigma_Z, Z_ini, verbose = FALSE) {
     .Call('_BNPMIXcluster_get_latents_cpp', PACKAGE = 'BNPMIXcluster', Y, var_type, mu_Z, sigma_Z, Z_ini, verbose)
 }
@@ -25,11 +29,3 @@ log_f_post_Omega_cpp <- function(Omega, Z, mu_Z, sampling_prob, Lambda) {
     .Call('_BNPMIXcluster_log_f_post_Omega_cpp', PACKAGE = 'BNPMIXcluster', Omega, Z, mu_Z, sampling_prob, Lambda)
 }
 
-rtn1 <- function(mean, sd, low, high) {
-    .Call('_BNPMIXcluster_rtn1', PACKAGE = 'BNPMIXcluster', mean, sd, low, high)
-}
-
-# Register entry points for exported C++ functions
-methods::setLoadAction(function(ns) {
-    .Call('_BNPMIXcluster_RcppExport_registerCCallable', PACKAGE = 'BNPMIXcluster')
-})

@@ -33,7 +33,7 @@ double log_f_post_a_cpp( double a,
   // target distribution: log-posterior distribution of 'a' //
 
   double log_post_a=0;
-  unsigned int n;
+
   unsigned int r;
 
   // auxiliar variables
@@ -41,7 +41,7 @@ double log_f_post_a_cpp( double a,
   double aux_double;
   arma::vec aux_vec;
 
-  if( a<0 | a>1 ){
+  if( (a<0) | (a>1) ){
     throw std::range_error("The value for a should be in [0,1)");
   }
 
@@ -50,14 +50,13 @@ double log_f_post_a_cpp( double a,
     throw std::range_error("The value for b has to be greater than -a");
   }
 
-  n = arma::sum(mu_star_n_r);
   r = mu_star_n_r.n_rows;
 
   aux_vec = arma::linspace<arma::vec>(1, r-1, r-1);
   log_post_a += arma::sum( log( b + a*aux_vec ) );
   aux_double=0;
   for( i=0; i<r ; i++){
-    aux_double += std::lgamma(mu_star_n_r(i)-a)-std::lgamma(1-a);
+    aux_double += lgamma(mu_star_n_r(i)-a)-lgamma(1-a);
   }
   log_post_a += aux_double;
   log_post_a += log_f_prior_a_cpp( a,

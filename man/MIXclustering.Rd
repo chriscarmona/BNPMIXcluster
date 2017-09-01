@@ -179,6 +179,7 @@ plot(x=jitter(sim.cluster.data$cluster),
      xlab="Real cluster",
      ylab="Model cluster",
      pch=19, col="#FF000020")
+
 }
 
 
@@ -225,7 +226,7 @@ Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
 Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
 
 cluster_estim_IIIa <- MIXclustering( Y_data,
-                          var_type=c("o","o","o","c"),
+                          var_type=c("m","o","o","c"),
                           n.iter_out=1000,
                           n.burn=200,
                           n.thin=2,

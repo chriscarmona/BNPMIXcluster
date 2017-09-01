@@ -30,7 +30,7 @@
 #' @examples
 #'
 #' ### Visualizing the simulated data for clustering ###
-#'
+#' 
 #' require(scatterplot3d)
 #'
 #' cluster_color <- c(rgb(1,0,0,alpha = 0.5),

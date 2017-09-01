@@ -27,7 +27,7 @@ double log_f_post_b_cpp( double b,
   log_prior_f_b = R::dgamma( b+a, d_0_b, d_1_b, 1 );
   log_f_post_b = 0;
   log_f_post_b += log_prior_f_b;
-  log_f_post_b += std::lgamma(b+1)-std::lgamma(b+n);
+  log_f_post_b += lgamma(b+1)-lgamma(b+n);
   aux_vec = arma::linspace<arma::vec>(1, r-1, r-1);
   log_f_post_b += arma::sum( log( b+a*aux_vec ) );
 

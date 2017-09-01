@@ -1,5 +1,5 @@
 #' @importFrom stats dbeta
-#'
+#' @importFrom compiler cmpfun
 
 log_f_post_a <- function(a,
                          b,
