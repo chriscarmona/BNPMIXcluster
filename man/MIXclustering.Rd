@@ -4,11 +4,11 @@
 \alias{MIXclustering}
 \title{Bayesian Nonparametric Model for Clustering with Mixed Scale Variables}
 \usage{
-MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
+MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
   d_0_b = 1, d_1_b = 5, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
-  expansion_f = NULL, max.time = Inf, USING_CPP = TRUE)
+  expansion_f = NULL, max.time = Inf, USING_CPP = TRUE, log_file = NULL)
 }
 \arguments{
 \item{x}{Matrix or data frame containing the data to be clustered.}
@@ -24,7 +24,7 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 3,
 
 \item{n.burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
-\item{n.thin}{Number of iterations discarded between two effective iterations, with the purpose of reducing the autocorrelation in the chain.}
+\item{n.thin}{Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n.thin iterations.}
 
 \item{a_fix}{A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.}
 

@@ -18,7 +18,7 @@
 #'
 #' @param n.iter_out Number of effective iterations in the MCMC procedure for clustering.
 #' @param n.burn Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.
-#' @param n.thin Number of iterations discarded between two effective iterations, with the purpose of reducing the autocorrelation in the chain.
+#' @param n.thin Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n.thin iterations.
 #'
 #' @param a_fix A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.
 #' @param alpha Hyperparameter in the prior distribution of \eqn{a}. See \code{details}.
@@ -274,7 +274,7 @@ MIXclustering <- function( x,
 
                            n.iter_out=1000,
                            n.burn=100,
-                           n.thin=3,
+                           n.thin=2,
 
                            a_fix=NULL,
                            alpha=0.5,
@@ -293,11 +293,39 @@ MIXclustering <- function( x,
                            expansion_f=NULL,
 
                            max.time=Inf,
-                           USING_CPP = TRUE ) {
-
-
+                           USING_CPP = TRUE,
+                           log_file=NULL ) {
+  
+  #on.exit(browser())
+  log_clock <- Sys.time()
+  
+  if( !is.null(log_file) ) {
+    cat("\n
+        ***** MIXclustering *****\n\n",
+        "----- characteristics -----\n",
+        "effective iterations = ",n.iter_out,"\n\n",
+        "alpha=",alpha,"\n",
+        "d_0_a=",d_0_a,"\n",
+        "d_1_a=",d_1_a,"\n",
+        "eta=",eta,"\n",
+        "d_0_b=",d_0_b,"\n",
+        "d_1_b=",d_1_b,"\n",
+        "kappa=",kappa,"\n",
+        "delta=",delta,"\n",
+        "d_0_z=",d_0_z,"\n",
+        "d_1_z=",d_1_z,"\n",
+        "d_0_mu=",d_0_mu,"\n",
+        "d_1_mu=",d_1_mu,"\n",
+        "---------------------------\n",
+        "Starting time:\n",as.character(log_clock),"\n\n",
+        "---------------------------\n\n",
+        "Iteration times:\n\n",
+        "iter_i , elapsed_minutes , Sys.time\n",
+        file=log_file)
+  }
+  
   dev_verbose = FALSE
-
+  
   cl <- match.call()
 
   # possible variable types that are allowed
@@ -329,7 +357,7 @@ MIXclustering <- function( x,
                     which(is.element(var_type,var_type_all[2])),
                     which(is.element(var_type,var_type_all[3])))
   var_type <- var_type[Y_new_order]
-  Y <- Y[,Y_new_order]
+  Y <- Y[,Y_new_order,drop=F]
 
   n <- nrow(Y)
   p <- ncol(Y)
@@ -400,12 +428,12 @@ MIXclustering <- function( x,
     Z <- get_latents( Y=Y,
                       var_type = var_type )
   }
-
+  
   ##### Missing data #####
   # Only consider rows with complete information, i.e. no missing data allowed
   aux_na_Y <- apply(!is.na(Z),1,all)
 
-  Z <- Z[aux_na_Y,]
+  Z <- Z[aux_na_Y,,drop=F]
   if(sum(!aux_na_Y)>0){
     cat(sum(!aux_na_Y),' rows with missing data were removed\n')
   }
@@ -419,13 +447,15 @@ MIXclustering <- function( x,
   ######
   #   total number of iterations
   #####
-  n.iter <- n.burn + 1 + (n.iter_out-1)*(n.thin+1)
+  n.iter <- n.burn + 1 + (n.iter_out-1)*(n.thin)
 
   ##### Start: Initializing the chain #####
 
   # sigma_Z: variances in Lambda
-  Lambda <- diag(apply(Z,2,sd))
-
+  sigma_Z_diag <- apply(Z,2,sd)
+  Lambda <- diag(sigma_Z_diag,nrow=length(sigma_Z_diag),ncol=length(sigma_Z_diag))
+  rm(sigma_Z_diag)
+  
   # unit variances for "sigma_Z"
   aux_var1_Z <- rep(F,n_q)
   if( n_o>0 ){
@@ -461,14 +491,22 @@ MIXclustering <- function( x,
   # and its mapping 'mu_star_map'
 
   # matrix with unique values of mu_Z
-  mu_star <- Z[!duplicated(Z[,1:2]),]
+  if(n_c>0) {
+    mu_star <- Z[!duplicated(Z[,1]),,drop=F]
+  } else {
+    mu_star <- Z[!duplicated(Z),,drop=F]
+  }
+  
   # mapping each mu_Z to mu_star
-  mu_star_map <- match(data.frame(t(Z[,1:2])), data.frame(t(mu_star[,1:2]))) # only matches with the two first values for computational efficiency
+  mu_star_map <- match(data.frame(t(Z)), data.frame(t(mu_star)))
+  
   # how many repeated values of each mu_star
   mu_star_n_r <- as.numeric(table(mu_star_map))
 
   # 'sigma_mu'
-  sigma_mu <- diag( diag(sigma_Z) )
+  sigma_mu <- sigma_Z
+  sigma_mu[] <- 0
+  diag(sigma_mu) <- diag( sigma_Z )
 
   if( (nrow(mu_star)!=length(mu_star_n_r)) | (nrow(Z)!=length(mu_star_map)) ) {
     cat('Error: there is an inconsistency between "mu_star", "mu_star_n_r" and "mu_star_map"\n')
@@ -514,7 +552,7 @@ MIXclustering <- function( x,
   lsa_iter <- c(ls(),"iter_i","lsa_iter","pb")
 
   for( iter_i in 1:n.iter) {
-
+    
     if(iter_i==1) {
       # initializing progress bar
       pb <- plyr::create_progress_bar("time")
@@ -605,7 +643,7 @@ MIXclustering <- function( x,
     aux_no_map <- is.element(mu_star_n_r_new,0)
 
     # Replaces new simulated values of mu_star
-    mu_star <- mu_star_new[!aux_no_map,]
+    mu_star <- mu_star_new[!aux_no_map,,drop=F]
     mu_star_map <- mu_star_map_new - cumsum(aux_no_map)[mu_star_map_new]
     mu_star_n_r <- mu_star_n_r_new[!aux_no_map]
 
@@ -617,6 +655,7 @@ MIXclustering <- function( x,
     ### (b) Sampling mu_star ###
 
     # Creating a copy to keep control of original values of mu_star
+    
     mu_star_new <- mu_star
     mu_star_new[] <- NA
     if(dev_verbose) {
@@ -707,7 +746,7 @@ MIXclustering <- function( x,
 
       aux_Lambda <-  sampling_Lambda_jj( n_sim_mh=1, sigma_jj_ini=Lambda_new[j_sigma,j_sigma]^2,j=j_sigma,
                                          d_0_z=d_0_z, d_1_z=d_1_z, kappa=kappa,
-                                         Z=Z, mu_Z=mu_star[mu_star_map,], sigma_Z=sigma_Z_new, sampling_prob=sampling_prob,
+                                         Z=Z, mu_Z=mu_star[mu_star_map,,drop=F], sigma_Z=sigma_Z_new, sampling_prob=sampling_prob,
                                          max.time=max.time,n.burn=0,
                                          verbose=F,
                                          USING_CPP=USING_CPP )
@@ -740,105 +779,113 @@ MIXclustering <- function( x,
 
 
     ### (e) Sampling sigma_Z, correlations in Omega ###
-    if(dev_verbose) {
-      cat( 'Sampling sigma_Z: correlations in Omega \n' )
-    }
-
-    if( !matrixcalc::is.positive.definite(Omega_new) ) {
-      cat("*****\nProcess finished because 'Omega_new' is not positive definite!\n*****");
-      return()
-    }
-
-    for(i_omega in 2:dim(Omega_new)[1]) {
-      for(j_omega in 1:(i_omega-1) ) {
-        if(dev_verbose) {
-          cat('(',i_omega,',',j_omega,') ',sep='')
-        }
-
-        aux_omega_ij_new <- sampling_Omega_ij( n=1,
-                                               Omega.ini=Omega_new,i=i_omega,j=j_omega,
-                                               delta=delta,
-                                               Z=Z, mu_Z=mu_star[mu_star_map,], Lambda=Lambda_new, sampling_prob=sampling_prob,
-                                               n.burn=0,n.thin=0,
-                                               max.time=max.time,
-                                               USING_CPP=USING_CPP )
-
-
-        omega_ij_new <- aux_omega_ij_new[[1]]
-        Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
-
-        Omega_new[i_omega,j_omega] <- Omega_new[j_omega,i_omega] <- omega_ij_new
-        if(dev_verbose) {
-          if(j_omega==(i_omega-1)) {cat('\n')}
-        }
-        if( !matrixcalc::is.positive.definite(Omega_new) ) {
-          cat("     Process finished because 'Omega_new' is not positive definite!\n");
-          return()
-        }
-
-      }
-    }
-    #rm(i_omega,j_omega,aux_omega_ij_new,omega_ij_new)#;gc()
-
-    # updates 'sigma_Z' after all element in 'Omega' are sampled
-    # only once because 'Omega' sampling IS NOT dependent of 'sigma_Z'
-    sigma_Z_new <- Lambda_new %*% Omega_new %*% Lambda_new
-
-    if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
-
-    if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
-      cat("*****\nProcess finished because 'sigma_Z_new' is not positive definite!\n*****");
-      return()
-    }
-
-    if(F) {
-      # Sampling sigma_Z in the old "tricky" way
-
-      # sigma_Z: variances in Lambda
+    if ( all(dim(Omega)>c(1,1)) ) {
       if(dev_verbose) {
-        cat('Sampling sigma_Z[j,j]...\n')
+        cat( 'Sampling sigma_Z: correlations in Omega \n' )
       }
-      for( j in 1:n_q) {
-        if(dev_verbose) {
-          cat(j,", ")
+      
+      if( !matrixcalc::is.positive.definite(Omega_new) ) {
+        cat("*****\nProcess finished because 'Omega_new' is not positive definite!\n*****");
+        return()
+      }
+      
+      for(i_omega in 2:dim(Omega_new)[1]) {
+        # i_omega <- 2
+        for(j_omega in 1:(i_omega-1) ) {
+          # j_omega <- 1
+          if(dev_verbose) {
+            cat('(',i_omega,',',j_omega,') ',sep='')
+          }
+          
+          aux_omega_ij_new <- sampling_Omega_ij( n=1,
+                                                 Omega.ini=Omega_new,
+                                                 i=i_omega,
+                                                 j=j_omega,
+                                                 delta=delta,
+                                                 Z=Z, mu_Z=mu_star[mu_star_map,,drop=F], Lambda=Lambda_new, sampling_prob=sampling_prob,
+                                                 n.burn=0,n.thin=0,
+                                                 max.time=max.time,
+                                                 USING_CPP=USING_CPP )
+          
+          
+          omega_ij_new <- aux_omega_ij_new[[1]]
+          Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
+          
+          Omega_new[i_omega,j_omega] <- Omega_new[j_omega,i_omega] <- omega_ij_new
+          if(dev_verbose) {
+            if(j_omega==(i_omega-1)) {cat('\n')}
+          }
+          if( !matrixcalc::is.positive.definite(Omega_new) ) {
+            cat("     Process finished because 'Omega_new' is not positive definite!\n");
+            return()
+          }
+          
         }
-        # j<-1
-        shape_gamma <- d_0_z + (n/2)
-        rate_gamma <- d_1_z + (1/2) * sum( (1/sampling_prob) * ( Z[,j] - mu_star[mu_star_map,j] )^2 )
-        Lambda_new[j,j] <- 1/rgamma(n=1,shape=shape_gamma,rate=rate_gamma)
       }
-      #rm(shape_gamma,rate_gamma)#; gc()
-
-      diag(Lambda_new)[aux_var1_Z] <- 1
-      #rm(aux_var1_Z)
-
-      # sigma_Z: correlations in Omega
-      Omega_new <- cor(Z)
-
+      #rm(i_omega,j_omega,aux_omega_ij_new,omega_ij_new)#;gc()
+      
+      # updates 'sigma_Z' after all element in 'Omega' are sampled
+      # only once because 'Omega' sampling IS NOT dependent of 'sigma_Z'
       sigma_Z_new <- Lambda_new %*% Omega_new %*% Lambda_new
-
+      
+      if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
+      
+      if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
+        cat("*****\nProcess finished because 'sigma_Z_new' is not positive definite!\n*****");
+        return()
+      }
+      
+      if(F) {
+        # Sampling sigma_Z in the old "tricky" way
+        
+        # sigma_Z: variances in Lambda
+        if(dev_verbose) {
+          cat('Sampling sigma_Z[j,j]...\n')
+        }
+        for( j in 1:n_q) {
+          if(dev_verbose) {
+            cat(j,", ")
+          }
+          # j<-1
+          shape_gamma <- d_0_z + (n/2)
+          browser()
+          rate_gamma <- d_1_z + (1/2) * sum( (1/sampling_prob) * ( Z[,j,drop=F] - mu_star[mu_star_map,j,drop=F] )^2 )
+          Lambda_new[j,j] <- 1/rgamma(n=1,shape=shape_gamma,rate=rate_gamma)
+        }
+        #rm(shape_gamma,rate_gamma)#; gc()
+        
+        diag(Lambda_new)[aux_var1_Z] <- 1
+        #rm(aux_var1_Z)
+        
+        # sigma_Z: correlations in Omega
+        Omega_new <- cor(Z)
+        
+        sigma_Z_new <- Lambda_new %*% Omega_new %*% Lambda_new
+        
+      }
+      
+      # eliminates the non-simmetry due to numerical precision
+      if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
+      
+      if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
+        cat("*****\nProcess finished because 'sigma_Z' is not positive definite!\n*****");
+        return()
+      }
+      
+      sigma_Z <- sigma_Z_new
+      Lambda <- Lambda_new
+      Omega <- Omega_new
+      
+      if(dev_verbose) {
+        cat('...Done! \n')
+      }
     }
-
-    # eliminates the non-simmetry due to numerical precision
-    if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
-
-    if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
-      cat("*****\nProcess finished because 'sigma_Z' is not positive definite!\n*****");
-      return()
-    }
-
-    sigma_Z <- sigma_Z_new
-    Lambda <- Lambda_new
-    Omega <- Omega_new
-    if(dev_verbose) {
-      cat('...Done! \n')
-    }
-
+    
     # (f) Sampling "a"
     if(dev_verbose) {
       cat( 'Sampling "a":\n' )
     }
-    if(is.null(a_fix)){
+    if(is.null(a_fix)) {
       aux_a_new <- sampling_a( n=1, a.ini=a,
                                b=b, alpha=alpha, d_0_a=d_0_a, d_1_a=d_1_a,
                                mu_star_n_r=mu_star_n_r,
@@ -896,13 +943,13 @@ MIXclustering <- function( x,
     if (USING_CPP) {
       Z_new <- get_latents_cpp( Y = as.matrix(Y),
                                 var_type = match(var_type, var_type_all),
-                                mu_Z = mu_star[mu_star_map,],
+                                mu_Z = mu_star[mu_star_map,,drop=F],
                                 sigma_Z = sigma_Z,
                                 Z_ini = Z )
     } else {
       Z_new <- get_latents( Y = Y,
                             var_type = var_type,
-                            mu_Z.ini = mu_star[mu_star_map,],
+                            mu_Z.ini = mu_star[mu_star_map,,drop=F],
                             sigma_Z.ini = sigma_Z,
                             Z.ini = Z )
     }
@@ -932,9 +979,20 @@ MIXclustering <- function( x,
 
     pb$step()
 
+    if( (!is.null(log_file) & (iter_i%%100)==0) || (iter_i==n.iter) ) {
+      cat( as.character(iter_i)," , ",difftime(time1=Sys.time(),time2=log_clock,units="mins")," , ",as.character(Sys.time())," \n",
+           file=log_file, append=TRUE )
+    }
+    
     #rm(list=setdiff(ls(),lsa_iter)); gc()
   }
 
+  if( !is.null(log_file) ) {
+    cat("\n\n---------------------------\n\n",
+        "Finish time:\n",as.character(Sys.time()),"\n\n",
+        file=log_file, append=TRUE)
+  }
+  
   #####
   #   Clustering results summary   #
   #####
@@ -949,7 +1007,7 @@ MIXclustering <- function( x,
 
   ### iterations that will be reported ###
   # after burn-in period and thinning
-  iter_out <- seq(from=n.burn+1,to=n.iter,by=(n.thin+1))
+  iter_out <- seq(from=n.burn+1,to=n.iter,by=(n.thin))
 
   ### reported clusters (after ordering) ###
   clusters <- sapply( mu_star_map_sim[,1+iter_out], sort.cluster )
@@ -1000,7 +1058,7 @@ MIXclustering <- function( x,
   # Which cluster is closer to the average similarity matrix #
   cluster.cta <- clusters[,which.min(cluster_dist)]
 
-  iter_out <- seq(from=n.burn+1,to=n.iter,by=(n.thin+1))
+  iter_out <- seq(from=n.burn+1,to=n.iter,by=(n.thin))
 
   # Summary of original variables by cluster
   Y <- data.frame(cluster=cluster.cta,Y_orig)

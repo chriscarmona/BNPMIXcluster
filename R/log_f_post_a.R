@@ -30,7 +30,9 @@ log_f_post_a <- function(a,
             log(1-alpha) + dbeta( x=a, shape1=d_0_a, shape2=d_1_a, log=T )
     ) }
   log_f_post_a = 0
-  log_f_post_a = log_f_post_a + sum( log(b+a*(1:(r-1)) ) )
+  if(r>1) {
+    log_f_post_a = log_f_post_a + sum( log( b+a*(1:(r-1)) ) )
+  }
   log_f_post_a = log_f_post_a + sum( lgamma(x=mu_star_n_r-a)-lgamma(x=1-a) )
   log_f_post_a = log_f_post_a + log_prior_f_a(a=a,alpha=alpha,d_0_a=d_0_a,d_1_a=d_1_a)
 

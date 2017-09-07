@@ -10,9 +10,17 @@ log_f_post_b <- function(b,
   n <- sum(mu_star_n_r)
   r <- length(mu_star_n_r)
 
-  # log-prior distribution of 'b' given 'a'
+  # prior distribution of b
   log_prior_f_b <- dgamma( b+a, shape=d_0_b, rate=d_1_b, log=T )
-  log_f_post_b <- lgamma(x=b+1)-lgamma(x=b+n) + sum( log( b+a*(1:(r-1)) ) ) + log_prior_f_b
+  
+  # log-prior distribution of 'b' given 'a'
+  log_prior_f_b <- 0
+  log_prior_f_b <- log_prior_f_b + ( lgamma(x=b+1)-lgamma(x=b+n) )
+  if(r>1) {
+    log_prior_f_b <- log_prior_f_b + sum( log( b+a*(1:(r-1)) ) )
+  }
+  log_prior_f_b <- log_prior_f_b + log_prior_f_b
+  
 
   return(log_f_post_b)
 }

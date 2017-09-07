@@ -65,6 +65,7 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
     )
     # exp(log_r)
 
+    # if(is.na(log_r)) {browser()}
     #if( runif(1,0,1) > lik_ratio ) {
     if( log_r>=0 || runif(1,0,1) < exp(log_r) ) {
       sigma_jj_chain <- c( sigma_jj_chain, sigma_jj_prop )
@@ -81,9 +82,7 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
     stop('There is a problem simulating from "sigma_j_prop"')
   }
 
-  #browser()
   if(accept_display) {
-    #browser()
     return( list( sigma_jj = sigma_jj_chain[(n.burn+2):length(sigma_jj_chain)],
                   accept_indic = accept_indic[(n.burn+2):length(accept_indic)] ) )
   } else {

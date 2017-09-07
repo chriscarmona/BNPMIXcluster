@@ -36,10 +36,10 @@ sampling_a <- function( n=1, a.ini,
                         max.time=Inf,
                         verbose=F,
                         USING_CPP=TRUE ) {
-
+  
   # Metropolis-Hastings for 'a' #
   # MH Sampling from 'a' #
-
+  
   if( a.ini<0 | a.ini>1 ){
     cat('\nError: the value for "a.ini" has to be in [0,1) \n')
     stop('the value for "a.ini" has to be in [0,1)') }
@@ -47,28 +47,28 @@ sampling_a <- function( n=1, a.ini,
     cat('\nError: the value for "b" has to be greater than -a.ini \n')
     stop('the value for "b" has to be greater than -a.ini')
   }
-
+  
   # browser()
-
+  
   #n.obs <- sum(mu_star_n_r)
   #r <- length(mu_star_n_r)
-
+  
   # initializing the chain #
   a.chain <- as.numeric(NULL)
   accept.indic <- as.logical(NULL)
   a <- a.ini
-
+  
   it_t_0 <- Sys.time()
   it_t_i <- as.numeric(Sys.time()-it_t_0)
-
+  
   # total number of iterations
   n.iter <- n.burn + 1 + (n-1)*(n.thin+1)
-
+  
   while( ( length(a.chain) < n.iter ) & (it_t_i<max.time) ) {
-
+    
     if(verbose) {cat(".")}
     it_t_i <- as.numeric(Sys.time()-it_t_0)
-
+    
     # generate proposal "a_new"
     if(b>0){
       a.prop <- rbinom( n=1, size=1, prob=1-alpha )
@@ -76,8 +76,8 @@ sampling_a <- function( n=1, a.ini,
     } else {
       a.prop <- runif(n=1,min=max(0,-b),max=1)
     }
-
-
+    
+    
     # posterior probability for the current value of a
     if(USING_CPP) {
       log_f_post_a <- log_f_post_a_cpp(a=a,
@@ -85,23 +85,31 @@ sampling_a <- function( n=1, a.ini,
                                        alpha=alpha,
                                        d_0_a=d_0_a,d_1_a=d_1_a,
                                        mu_star_n_r=mu_star_n_r)
+      
+      log_f_post_a.prop <- log_f_post_a_cpp(a=a.prop,
+                                            b=b,
+                                            alpha=alpha,
+                                            d_0_a=d_0_a,d_1_a=d_1_a,
+                                            mu_star_n_r=mu_star_n_r)
     } else {
       log_f_post_a <- log_f_post_a(a=a,
                                    b=b,
                                    alpha=alpha,
                                    d_0_a=d_0_a,d_1_a=d_1_a,
                                    mu_star_n_r=mu_star_n_r)
+      
+      log_f_post_a.prop <- log_f_post_a(a=a.prop,
+                                        b=b,
+                                        alpha=alpha,
+                                        d_0_a=d_0_a,d_1_a=d_1_a,
+                                        mu_star_n_r=mu_star_n_r)
     }
     # posterior probability for the proposal value of a
-    log_f_post_a.prop <- log_f_post_a(a=a.prop,
-                                      b=b,
-                                      alpha=alpha,
-                                      d_0_a=d_0_a,d_1_a=d_1_a,
-                                      mu_star_n_r=mu_star_n_r)
-
+    
+    
     log_r <- log_f_post_a.prop - log_f_post_a
     # exp(log_r)
-
+    
     #if( runif(1,0,1) > lik_ratio ) {
     if(is.na(log_r)) {browser()}
     if( log_r>=0 || runif(1,0,1) < exp(log_r) ) {
@@ -113,17 +121,17 @@ sampling_a <- function( n=1, a.ini,
       accept.indic <- c(accept.indic,F)
     }
   }
-
+  
   if(it_t_i>max.time) {
     cat('Error: TIMEOUT, There is a problem simulating from "a" \n')
     stop('TIMEOUT, There is a problem simulating from "a"')
   }
-
+  
   index.iter.out <- seq(from=n.burn+1,to=n.iter,by=(n.thin+1))
-
+  
   a.sim <- list( a.chain = a.chain[index.iter.out],
                  accept.indic = accept.indic )
-
+  
   return( a.sim )
 }
 

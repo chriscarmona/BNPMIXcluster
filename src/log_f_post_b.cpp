@@ -23,14 +23,18 @@ double log_f_post_b_cpp( double b,
   n = arma::sum(mu_star_n_r);
   r = mu_star_n_r.n_rows;
 
-  // log-prior distribution of 'b' given 'a'
+  // log-prior distribution of 'b'
   log_prior_f_b = R::dgamma( b+a, d_0_b, d_1_b, 1 );
+  
+  // log-posterior distribution of 'b'
   log_f_post_b = 0;
   log_f_post_b += log_prior_f_b;
   log_f_post_b += lgamma(b+1)-lgamma(b+n);
-  aux_vec = arma::linspace<arma::vec>(1, r-1, r-1);
-  log_f_post_b += arma::sum( log( b+a*aux_vec ) );
-
+  if(r>1) {
+    aux_vec = arma::linspace<arma::vec>(1, r-1, r-1);
+    log_f_post_b += arma::sum( log( b+a*aux_vec ) );
+  }
+  
   return log_f_post_b;
 
 }
