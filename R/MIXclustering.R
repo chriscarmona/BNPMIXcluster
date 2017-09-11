@@ -420,7 +420,8 @@ MIXclustering <- function( x,
   #####     Simulating latent variables 'Z' from 'Y'     #####
 
   # simulated latent variables
-  if (USING_CPP) {
+  #if (USING_CPP) {
+  if (FALSE) {
     Z <- get_latents_cpp( Y=as.matrix(Y),
                           var_type = match(var_type,var_type_all),
                           mu_Z = matrix(0,nrow=n,ncol=n_q),

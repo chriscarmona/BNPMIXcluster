@@ -94,7 +94,7 @@ A full description of the model is in the article Carmona et al. (2016) (preprin
 
 The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
 
-For the continuous variables, the algorithm assumes they come from a Gaussian shaped distribution. The user may have transformed the original values before using the function \code{MIXclustering}.
+For the continuous variables, it is convenient that the variables have a real support. The user may have transformed the original values before using the function \code{MIXclustering}.
 
 For each response \eqn{y_i=(y_{i,1},...,y_{i,p})} (of dimension \eqn{p}) a corresponding latent vector \eqn{z_i=(z_{i,1},...,z_{i,q})} (of dimension \eqn{q}) is created, according to the following:
 \itemize{
