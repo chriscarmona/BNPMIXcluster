@@ -52,18 +52,18 @@ sampling_b <- function( n_sim_mh=1, b_ini,
                                             d_0_b=d_0_b,d_1_b=d_1_b,
                                             mu_star_n_r=mu_star_n_r)
     } else {
-      log_f_post_b_curr <- log_f_post_b(b=b_chain[length(b_chain)],
-                                        a=a,
-                                        d_0_b=d_0_b,d_1_b=d_1_b,
-                                        mu_star_n_r=mu_star_n_r)
-      log_f_post_b_prop <- log_f_post_b(b=b_prop,
-                                        a=a,
-                                        d_0_b=d_0_b,d_1_b=d_1_b,
-                                        mu_star_n_r=mu_star_n_r)
+      log_f_post_b_curr <- log_f_post_b( b = b_chain[length(b_chain)],
+                                         a = a,
+                                         d_0_b = d_0_b,
+                                         d_1_b = d_1_b,
+                                         mu_star_n_r = mu_star_n_r )
+      log_f_post_b_prop <- log_f_post_b( b = b_prop,
+                                         a = a,
+                                         d_0_b = d_0_b,
+                                         d_1_b = d_1_b,
+                                         mu_star_n_r = mu_star_n_r )
     }
-
-
-
+    
     b_cur_interval_given_prop <- c(max(-a,b_prop-eta),b_prop+eta)
 
     log_r <- (log_f_post_b_prop - log_f_post_b_curr) + ( log(1/diff(b_cur_interval_given_prop)) - log(1/diff(b_prop_interval)) )

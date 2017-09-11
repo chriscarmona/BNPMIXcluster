@@ -61,6 +61,8 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
 \item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
 
 \item{USING_CPP}{Indicates wheter to use optimized functions developed in C++ (TRUE default)}
+
+\item{log_file}{Specifies a file to save the details with the execution time and the parameters used.}
 }
 \value{
 \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
@@ -228,7 +230,7 @@ Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
 Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
 
 cluster_estim_IIIa <- MIXclustering( Y_data,
-                          var_type=c("m","o","o","c"),
+                          var_type=c("o","o","o","c"),
                           n.iter_out=1000,
                           n.burn=200,
                           n.thin=2,

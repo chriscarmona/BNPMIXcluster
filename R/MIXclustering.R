@@ -41,6 +41,7 @@
 #'
 #' @param max.time Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.
 #' @param USING_CPP Indicates wheter to use optimized functions developed in C++ (TRUE default)
+#' @param log_file Specifies a file to save the details with the execution time and the parameters used.
 #'
 #' @details
 #'
@@ -209,7 +210,7 @@
 #' Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
 #'
 #' cluster_estim_IIIa <- MIXclustering( Y_data,
-#'                           var_type=c("m","o","o","c"),
+#'                           var_type=c("o","o","o","c"),
 #'                           n.iter_out=1000,
 #'                           n.burn=200,
 #'                           n.thin=2,
@@ -420,8 +421,7 @@ MIXclustering <- function( x,
   #####     Simulating latent variables 'Z' from 'Y'     #####
 
   # simulated latent variables
-  #if (USING_CPP) {
-  if (FALSE) {
+  if (USING_CPP) {
     Z <- get_latents_cpp( Y=as.matrix(Y),
                           var_type = match(var_type,var_type_all),
                           mu_Z = matrix(0,nrow=n,ncol=n_q),
@@ -607,6 +607,22 @@ MIXclustering <- function( x,
           D_values[r] <- ( mu_star_n_r_temp[r] - a ) * dmvnrm_arma( x=Z[i,,drop=F] , mean=mu_star[r,], sigma=sampling_prob[i]*sigma_Z )
         }
         D_values[D_values<0] <- 0
+        
+        if(F) {
+          # Comparing R output with C++ output
+          D_0_aux <- ( b + a * r_i ) * mvtnorm::dmvnorm( x=Z[i,] , mean=rep(0,n_q), sigma=sampling_prob[i]*sigma_Z+sigma_mu )
+          D_values_aux <- as.numeric(NULL)
+          for(r in 1:length(mu_star_n_r_temp)) {
+            D_values_aux[r] <- ( mu_star_n_r_temp[r] - a ) * mvtnorm::dmvnorm( x=Z[i,] , mean=mu_star[r,], sigma=sampling_prob[i]*sigma_Z )
+          }
+          D_values_aux[D_values_aux<0] <- 0
+          
+          if( any(c(D_0,D_values)-c(D_0_aux,D_values_aux)>1e-7) ) {
+            cat('\nError: There is a problem with "D_r" in the simulation of mu_Z')
+            browser()
+            #stop('There is a problem with "D_r" in the simulation of mu_Z')
+          }
+        }
       } else {
         D_0 <- ( b + a * r_i ) * mvtnorm::dmvnorm( x=Z[i,] , mean=rep(0,n_q), sigma=sampling_prob[i]*sigma_Z+sigma_mu )
         D_values <- as.numeric(NULL)
