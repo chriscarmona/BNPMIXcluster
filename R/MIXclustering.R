@@ -36,21 +36,23 @@
 #'
 #' @param delta Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for the correlation of latent variables.
 #'
-#' @param d_0_mu Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.
-#' @param d_1_mu Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.
+#' @param d_0_mu Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.
+#' @param d_1_mu Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.
 #'
 #' @param max.time Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.
 #' @param USING_CPP Indicates wheter to use optimized functions developed in C++ (TRUE default)
 #'
 #' @details
 #'
-#' The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
+#' The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 #'
 #' Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 #'
 #' A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 #'
 #' The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
+#'
+#' For the continuous variables, it is convenient that the variables have a real support. The user may have transformed the original values before using the function \code{MIXclustering}.
 #'
 #' For each response \eqn{y_i=(y_{i,1},...,y_{i,p})} (of dimension \eqn{p}) a corresponding latent vector \eqn{z_i=(z_{i,1},...,z_{i,q})} (of dimension \eqn{q}) is created, according to the following:
 #' \itemize{
@@ -100,13 +102,13 @@
 #'
 #' An object of class "MIXcluster" is a list containing the following components:
 #' \describe{
-#'     \item{\code{cluster}}{vector with the cluster allocation for each each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+#'     \item{\code{cluster}}{vector with the cluster allocation for each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
 #'     \item{\code{Y.cluster.summary}}{a summary of the data divided by the allocation in \code{$cluster}.}
 #'     \item{\code{Y.var_type}}{vector with the variable types in the data.}
 #'     \item{\code{Y.na}}{vector specifying the rows with missing values.}
 #'     \item{\code{Y.n}}{number of rows in the data.}
 #'     \item{\code{Y.p}}{number of variables in the data.}
-#'     \item{\code{MC.clusters}}{matrix with the cluster allocation for each each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+#'     \item{\code{MC.clusters}}{matrix with the cluster allocation for each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
 #'     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
 #'     \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
 #'     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
@@ -162,8 +164,8 @@
 #'      pch=19, col="#FF000020")
 #'
 #' }
-#' 
-#' 
+#'
+#'
 #' ### Exercise (IIb) from section 5.1 in Carmona et al. (2016)
 #' ### Two binary and one continuous variables
 #' \dontrun{
@@ -263,10 +265,10 @@
 #'
 #' @importFrom stats aggregate as.formula cor rgamma rmultinom sd
 #' @import plyr
-#' 
+#'
 #' @useDynLib BNPMIXcluster
 #' @importFrom Rcpp sourceCpp
-#' 
+#'
 #' @export
 
 MIXclustering <- function( x,
@@ -281,7 +283,7 @@ MIXclustering <- function( x,
                            d_0_a=1, d_1_a=1,
 
                            b_fix=NULL,
-                           d_0_b=1, d_1_b=5,
+                           d_0_b=1, d_1_b=1,
                            eta=2,
 
                            d_0_z=2.1, d_1_z=30,
@@ -295,10 +297,10 @@ MIXclustering <- function( x,
                            max.time=Inf,
                            USING_CPP = TRUE,
                            log_file=NULL ) {
-  
+
   #on.exit(browser())
   log_clock <- Sys.time()
-  
+
   if( !is.null(log_file) ) {
     cat("\n
         ***** MIXclustering *****\n\n",
@@ -323,9 +325,9 @@ MIXclustering <- function( x,
         "iter_i , elapsed_minutes , Sys.time\n",
         file=log_file)
   }
-  
+
   dev_verbose = FALSE
-  
+
   cl <- match.call()
 
   # possible variable types that are allowed
@@ -428,7 +430,7 @@ MIXclustering <- function( x,
     Z <- get_latents( Y=Y,
                       var_type = var_type )
   }
-  
+
   ##### Missing data #####
   # Only consider rows with complete information, i.e. no missing data allowed
   aux_na_Y <- apply(!is.na(Z),1,all)
@@ -455,7 +457,7 @@ MIXclustering <- function( x,
   sigma_Z_diag <- apply(Z,2,sd)
   Lambda <- diag(sigma_Z_diag,nrow=length(sigma_Z_diag),ncol=length(sigma_Z_diag))
   rm(sigma_Z_diag)
-  
+
   # unit variances for "sigma_Z"
   aux_var1_Z <- rep(F,n_q)
   if( n_o>0 ){
@@ -496,10 +498,10 @@ MIXclustering <- function( x,
   } else {
     mu_star <- Z[!duplicated(Z),,drop=F]
   }
-  
+
   # mapping each mu_Z to mu_star
   mu_star_map <- match(data.frame(t(Z)), data.frame(t(mu_star)))
-  
+
   # how many repeated values of each mu_star
   mu_star_n_r <- as.numeric(table(mu_star_map))
 
@@ -552,7 +554,7 @@ MIXclustering <- function( x,
   lsa_iter <- c(ls(),"iter_i","lsa_iter","pb")
 
   for( iter_i in 1:n.iter) {
-    
+
     if(iter_i==1) {
       # initializing progress bar
       pb <- plyr::create_progress_bar("time")
@@ -655,7 +657,7 @@ MIXclustering <- function( x,
     ### (b) Sampling mu_star ###
 
     # Creating a copy to keep control of original values of mu_star
-    
+
     mu_star_new <- mu_star
     mu_star_new[] <- NA
     if(dev_verbose) {
@@ -783,12 +785,12 @@ MIXclustering <- function( x,
       if(dev_verbose) {
         cat( 'Sampling sigma_Z: correlations in Omega \n' )
       }
-      
+
       if( !matrixcalc::is.positive.definite(Omega_new) ) {
         cat("*****\nProcess finished because 'Omega_new' is not positive definite!\n*****");
         return()
       }
-      
+
       for(i_omega in 2:dim(Omega_new)[1]) {
         # i_omega <- 2
         for(j_omega in 1:(i_omega-1) ) {
@@ -796,7 +798,7 @@ MIXclustering <- function( x,
           if(dev_verbose) {
             cat('(',i_omega,',',j_omega,') ',sep='')
           }
-          
+
           aux_omega_ij_new <- sampling_Omega_ij( n=1,
                                                  Omega.ini=Omega_new,
                                                  i=i_omega,
@@ -806,11 +808,11 @@ MIXclustering <- function( x,
                                                  n.burn=0,n.thin=0,
                                                  max.time=max.time,
                                                  USING_CPP=USING_CPP )
-          
-          
+
+
           omega_ij_new <- aux_omega_ij_new[[1]]
           Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
-          
+
           Omega_new[i_omega,j_omega] <- Omega_new[j_omega,i_omega] <- omega_ij_new
           if(dev_verbose) {
             if(j_omega==(i_omega-1)) {cat('\n')}
@@ -819,25 +821,25 @@ MIXclustering <- function( x,
             cat("     Process finished because 'Omega_new' is not positive definite!\n");
             return()
           }
-          
+
         }
       }
       #rm(i_omega,j_omega,aux_omega_ij_new,omega_ij_new)#;gc()
-      
+
       # updates 'sigma_Z' after all element in 'Omega' are sampled
       # only once because 'Omega' sampling IS NOT dependent of 'sigma_Z'
       sigma_Z_new <- Lambda_new %*% Omega_new %*% Lambda_new
-      
+
       if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
-      
+
       if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
         cat("*****\nProcess finished because 'sigma_Z_new' is not positive definite!\n*****");
         return()
       }
-      
+
       if(F) {
         # Sampling sigma_Z in the old "tricky" way
-        
+
         # sigma_Z: variances in Lambda
         if(dev_verbose) {
           cat('Sampling sigma_Z[j,j]...\n')
@@ -853,34 +855,34 @@ MIXclustering <- function( x,
           Lambda_new[j,j] <- 1/rgamma(n=1,shape=shape_gamma,rate=rate_gamma)
         }
         #rm(shape_gamma,rate_gamma)#; gc()
-        
+
         diag(Lambda_new)[aux_var1_Z] <- 1
         #rm(aux_var1_Z)
-        
+
         # sigma_Z: correlations in Omega
         Omega_new <- cor(Z)
-        
+
         sigma_Z_new <- Lambda_new %*% Omega_new %*% Lambda_new
-        
+
       }
-      
+
       # eliminates the non-simmetry due to numerical precision
       if( max( abs(sigma_Z_new-t(sigma_Z_new)) ) < 1e-7 ) {sigma_Z_new <- sigma_Z_new - (sigma_Z_new-t(sigma_Z_new))/2} else {stop('There is a problem simulating from "sigma_Z"')}
-      
+
       if( !matrixcalc::is.positive.definite(sigma_Z_new) ) {
         cat("*****\nProcess finished because 'sigma_Z' is not positive definite!\n*****");
         return()
       }
-      
+
       sigma_Z <- sigma_Z_new
       Lambda <- Lambda_new
       Omega <- Omega_new
-      
+
       if(dev_verbose) {
         cat('...Done! \n')
       }
     }
-    
+
     # (f) Sampling "a"
     if(dev_verbose) {
       cat( 'Sampling "a":\n' )
@@ -983,7 +985,7 @@ MIXclustering <- function( x,
       cat( as.character(iter_i)," , ",difftime(time1=Sys.time(),time2=log_clock,units="mins")," , ",as.character(Sys.time())," \n",
            file=log_file, append=TRUE )
     }
-    
+
     #rm(list=setdiff(ls(),lsa_iter)); gc()
   }
 
@@ -992,7 +994,7 @@ MIXclustering <- function( x,
         "Finish time:\n",as.character(Sys.time()),"\n\n",
         file=log_file, append=TRUE)
   }
-  
+
   #####
   #   Clustering results summary   #
   #####

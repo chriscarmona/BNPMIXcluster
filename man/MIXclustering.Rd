@@ -6,7 +6,7 @@
 \usage{
 MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
-  d_0_b = 1, d_1_b = 5, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
+  d_0_b = 1, d_1_b = 1, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
   expansion_f = NULL, max.time = Inf, USING_CPP = TRUE, log_file = NULL)
 }
@@ -50,9 +50,9 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
 
 \item{delta}{Tuning parameter controlling the proposal in the \emph{Metropolis-Hastings} step for the correlation of latent variables.}
 
-\item{d_0_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
+\item{d_0_mu}{Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.}
 
-\item{d_1_mu}{Hyperparameter in the prior distribution of the variance within each cluster. See \code{details}.}
+\item{d_1_mu}{Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.}
 
 \item{sampling_prob}{vector with the sampling probabilities \eqn{\pi_i} for each individual in case that the data come from a complex survey sample. By default \eqn{\pi_i=1}.}
 
@@ -69,13 +69,13 @@ The generic methods \code{\link{summary}} and \code{\link{plot}} are defined for
 
 An object of class "MIXcluster" is a list containing the following components:
 \describe{
-    \item{\code{cluster}}{vector with the cluster allocation for each each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+    \item{\code{cluster}}{vector with the cluster allocation for each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
     \item{\code{Y.cluster.summary}}{a summary of the data divided by the allocation in \code{$cluster}.}
     \item{\code{Y.var_type}}{vector with the variable types in the data.}
     \item{\code{Y.na}}{vector specifying the rows with missing values.}
     \item{\code{Y.n}}{number of rows in the data.}
     \item{\code{Y.p}}{number of variables in the data.}
-    \item{\code{MC.clusters}}{matrix with the cluster allocation for each each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+    \item{\code{MC.clusters}}{matrix with the cluster allocation for each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
     \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
@@ -86,13 +86,15 @@ An object of class "MIXcluster" is a list containing the following components:
 \code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
 }
 \details{
-The model consists in a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
+The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
 
 A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 
 The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
+
+For the continuous variables, the algorithm assumes they come from a Gaussian shaped distribution. The user may have transformed the original values before using the function \code{MIXclustering}.
 
 For each response \eqn{y_i=(y_{i,1},...,y_{i,p})} (of dimension \eqn{p}) a corresponding latent vector \eqn{z_i=(z_{i,1},...,z_{i,q})} (of dimension \eqn{q}) is created, according to the following:
 \itemize{
