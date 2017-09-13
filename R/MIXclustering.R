@@ -296,6 +296,7 @@ MIXclustering <- function( x,
                            expansion_f=NULL,
 
                            max.time=Inf,
+                           
                            USING_CPP = TRUE,
                            log_file=NULL ) {
 

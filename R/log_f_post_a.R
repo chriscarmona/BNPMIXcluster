@@ -1,17 +1,18 @@
 #' @importFrom stats dbeta
 #' @importFrom compiler cmpfun
 
+# prior distribution of 'a'
 log_prior_f_a <- function( a,
                            alpha,
                            d_0_a,
                            d_1_a ){
-  # prior distribution of 'a'
   ifelse( a==0 ,
           log(alpha),
           log(1-alpha) + dbeta( x=a, shape1=d_0_a, shape2=d_1_a, log=T )
   )
 }
 
+# posterior distribution of 'a'
 log_f_post_a <- function( a,
                           b,
                           alpha,d_0_a,d_1_a,

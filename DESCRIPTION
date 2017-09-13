@@ -10,18 +10,15 @@ Description: Bayesian nonparametric approach for clustering that is capable to c
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
-    R (>= 2.10)
+    R (>= 2.10),
 Imports:
-    Rcpp (>= 0.12.12),
+    Rcpp,
     matrixcalc,
     truncnorm,
     mvtnorm,
     plyr,
     MASS,
     compiler
-LinkingTo:
-    Rcpp,
-    RcppArmadillo,
-Suggests:
-    scatterplot3d
+LinkingTo: Rcpp, RcppArmadillo,
+Suggests: scatterplot3d
 RoxygenNote: 6.0.1
