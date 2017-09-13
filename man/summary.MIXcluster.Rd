@@ -17,4 +17,3 @@
 \seealso{
 \code{\link{MIXclustering}}
 }
-

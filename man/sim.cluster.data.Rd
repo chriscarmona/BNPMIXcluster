@@ -93,4 +93,3 @@ sim.cluster.data <- cbind(sim.cluster.data,sim.cluster.data.Z)
 \seealso{
 \code{\link{MIXclustering}}
 }
-

@@ -32,4 +32,3 @@ For each variable in the \code{Y} data frame, an associated continuos latent var
     If \eqn{Y} is categorical, the function will scan the unique values of \eqn{Y} and generate continuous latent variables accordingly.
 }
 \keyword{internal}
-

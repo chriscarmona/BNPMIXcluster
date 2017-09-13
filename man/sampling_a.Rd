@@ -45,4 +45,3 @@ The simulation is done via Metropolis-Hastings method.
 Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 }
 \keyword{internal}
-
