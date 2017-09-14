@@ -72,12 +72,14 @@ The generic methods \code{\link{summary}} and \code{\link{plot}} are defined for
 An object of class "MIXcluster" is a list containing the following components:
 \describe{
     \item{\code{cluster}}{vector with the cluster allocation for each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+    \item{\code{cluster_heterogeneity}}{Heterogeneity Measure (HM) for the cluster in the previous point. The HM measure is discussed in section 4 of Carmona et al. (2017).}
     \item{\code{Y.cluster.summary}}{a summary of the data divided by the allocation in \code{$cluster}.}
     \item{\code{Y.var_type}}{vector with the variable types in the data.}
     \item{\code{Y.na}}{vector specifying the rows with missing values.}
     \item{\code{Y.n}}{number of rows in the data.}
     \item{\code{Y.p}}{number of variables in the data.}
     \item{\code{MC.clusters}}{matrix with the cluster allocation for each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+    \item{\code{MC.clusters_heterogeneity}}{Heterogeneity Measure (HM) for all the clusters returned in \code{MC.clusters}.}
     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
     \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
@@ -189,14 +191,22 @@ summary(cluster_ex)
 plot(cluster_ex,type="heatmap")
 plot(cluster_ex,type="chain")
 
+# Comparison of cluster configurations #
+# 1) Minimum distance with average MCMC iterations
+# 2) Minimum Heterogeneity Measure (HM)
+plot( x=jitter(cluster_ex$cluster),y=jitter(cluster_ex$clusterHMmin), col="#FF000080", pch=20,
+      main=paste("Comparison of two relevant cluster configurations"),
+      xlab="minimizes distance to average MCMC grouping", ylab="minimizes Heterogeneity Measure" )
+
 # Comparison with the original clusters in the simulated data
 plot(x=jitter(Z_latent_ex_5_1$cluster),
      y=jitter(cluster_ex$cluster),
-     main="",
+     main=paste("Comparison real configuration with the model results"),
      xlab="Real cluster",
      ylab="Model cluster",
-     pch=19, col="#FF000020")
+     pch=19, col="#FF000080")
 }
+
 
 ##### Testing "MIXclustering" function with poverty.data #####
 # Using entity 15 (Edomex) #

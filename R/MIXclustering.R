@@ -104,12 +104,14 @@
 #' An object of class "MIXcluster" is a list containing the following components:
 #' \describe{
 #'     \item{\code{cluster}}{vector with the cluster allocation for each row in the data. It corresponds to the iteration which is Closest-To-Average (CTA) arrangement.}
+#'     \item{\code{cluster_heterogeneity}}{Heterogeneity Measure (HM) for the cluster in the previous point. The HM measure is discussed in section 4 of Carmona et al. (2017).}
 #'     \item{\code{Y.cluster.summary}}{a summary of the data divided by the allocation in \code{$cluster}.}
 #'     \item{\code{Y.var_type}}{vector with the variable types in the data.}
 #'     \item{\code{Y.na}}{vector specifying the rows with missing values.}
 #'     \item{\code{Y.n}}{number of rows in the data.}
 #'     \item{\code{Y.p}}{number of variables in the data.}
 #'     \item{\code{MC.clusters}}{matrix with the cluster allocation for each row in the data. Each column corresponds to an effective iteration in the MCMC simulation of the model (after discarding burn-in and thinning iterations).}
+#'     \item{\code{MC.clusters_heterogeneity}}{Heterogeneity Measure (HM) for all the clusters returned in \code{MC.clusters}.}
 #'     \item{\code{cluster.matrix.avg}}{average similarity matrix of size \eqn{n} by \eqn{n}.}
 #'     \item{\code{MC.values}}{a list with the simulated values of the chains for the parameters \eqn{a},\eqn{b},\eqn{\Lambda},\eqn{\Omega}.}
 #'     \item{\code{MC.accept.rate}}{a named vector with the acceptance rates for each parameter. It includes iterations that are discarded in the burn-in period and thinning.}
@@ -168,15 +170,23 @@
 #' # Representation of clustering results
 #' plot(cluster_ex,type="heatmap")
 #' plot(cluster_ex,type="chain")
-#'
+#' 
+#' # Comparison of cluster configurations #
+#' # 1) Minimum distance with average MCMC iterations
+#' # 2) Minimum Heterogeneity Measure (HM)
+#' plot( x=jitter(cluster_ex$cluster),y=jitter(cluster_ex$clusterHMmin), col="#FF000080", pch=20,
+#'       main=paste("Comparison of two relevant cluster configurations"),
+#'       xlab="minimizes distance to average MCMC grouping", ylab="minimizes Heterogeneity Measure" )
+#' 
 #' # Comparison with the original clusters in the simulated data
 #' plot(x=jitter(Z_latent_ex_5_1$cluster),
 #'      y=jitter(cluster_ex$cluster),
-#'      main="",
+#'      main=paste("Comparison real configuration with the model results"),
 #'      xlab="Real cluster",
 #'      ylab="Model cluster",
-#'      pch=19, col="#FF000020")
+#'      pch=19, col="#FF000080")
 #' }
+#'
 #'
 #' ##### Testing "MIXclustering" function with poverty.data #####
 #' # Using entity 15 (Edomex) #
@@ -218,7 +228,7 @@
 #'
 #' @useDynLib BNPMIXcluster
 #' @importFrom Rcpp sourceCpp
-#'
+#' @importFrom stats weighted.mean 
 #' @export
 
 MIXclustering <- function( x,
@@ -1050,10 +1060,34 @@ MIXclustering <- function( x,
     } else { stop('There is an unknown type in "var_type_orig"') }
   }
 
+  
+  ### Cluster Heterogeneity Measure ###
+  q<-ncol(Y)
+  hm <- vector("numeric")
+  for( k in 1:dim(clusters)[2] ) {
+    # k <- 1
+    cluster<-clusters[,k]
+    nc<-max(cluster)
+    nr<-table(cluster)[1:nc]
+    
+    hmm<-matrix(NA,nc,q)
+    for (i in 1:nc){
+      # i <- 1
+      for (j in 1:q){
+        # j <- 1
+        xbar<-weighted.mean(Y[cluster==i,j],expansion_f[cluster==i])
+        x2bar<-weighted.mean(Y[cluster==i,j]^2,expansion_f[cluster==i])
+        hmm[i,j]<-x2bar-xbar^2
+      }
+    }
+    hm <- c( hm, sum(apply(hmm,1,sum)*nr) )
+  }
+  
   dpclust <- structure(
     list(
       cluster=cluster.cta[map_z_to_orig],
-
+      clusterHMmin = clusters[map_z_to_orig,which.min(hm)],
+      
       Y.cluster.summary=Y.cluster.summary,
 
       Y.var_type=var_type_orig,
@@ -1062,7 +1096,12 @@ MIXclustering <- function( x,
       Y.p=p,
 
       MC.clusters=clusters[map_z_to_orig,],
-
+      
+      # Heterogeneity Measure (HM)
+      cluster.HM=hm[which.min(cluster_dist)],
+      clusterHMmin.HM=min(hm),
+      MC.clusters.HM=hm,
+      
       cluster.matrix.avg=cluster.matrix.avg[map_z_to_orig,map_z_to_orig],
 
       #mu_star_n_r_sim=mu_star_n_r_sim,
