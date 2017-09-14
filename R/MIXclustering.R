@@ -120,113 +120,63 @@
 #' \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
 #'
 #' @examples
-#'
-#' ##### Testing "MIXclustering" function with simulated clustered data #####
-#' # for more information about the data...
-#' \dontrun{
-#' help(sim.cluster.data)
-#' }
-#'
-#'
-#' ### Exercise (Ic) from section 5.1 in Carmona et al. (2016)
-#' ### using 3 continuous variables
-#' \dontrun{
+#' 
+#' ##############################
+#' #        Exercise 5.1        #
+#' #    Carmona et al. (2017)   #
+#' ##############################
 #' set.seed(0) # for reproducibility
-#'
-#' Y_data <- sim.cluster.data[,2:4]
-#' colnames(Y_data) <- paste("Y",1:3,sep=".")
-#'
-#' cluster_estim_Ic <- MIXclustering( Y_data,
-#'                           var_type=c("c","c","c"),
-#'                           n.iter_out=1000,
-#'                           n.burn=200,
-#'                           n.thin=2,
-#'                           alpha=0.5,
-#'                           d_0_a = 1, d_1_a = 1,
-#'                           d_0_b = 1, d_1_b = 1,
-#'                           d_0_z = 2.1, d_1_z = 30,
-#'                           d_0_mu = 2.1, d_1_mu = 30
-#'                           )
-#' cluster_estim_Ic
-#'
+#' ### This example ilustrate the use of the function MIXclustering  ###
+#' # Data and parameters are discussed in section 5.1 of Carmona et al. (2017) #
+#' 
+#' # Specification of data Y #
+#' help(Y_ex_5_1)
+#' # Choose 1, 2, or 3 #
+#' ex_i <- 1
+#' 
+#' # specification of parameters #
+#' help(meta_param_ex)
+#' # Choose "a", "b" or "v" #
+#' param_j <- "c"
+#' 
+#' var_type_Y_ex_5_1 <- list( c("c","c","c"),
+#'                            c("o","o"),
+#'                            c("o","o","o","c") )
+#' \dontrun{
+#' cluster_ex <- MIXclustering( x = as.matrix(Y_ex_5_1[[ ex_i ]]),
+#'                              var_type=var_type_Y_ex_5_1[[ ex_i ]],
+#'                              n.iter_out=1500,
+#'                              n.burn=200,
+#'                              n.thin=3,
+#'                              
+#'                              alpha = meta_param_ex[ param_j, "alpha" ],
+#'                              d_0_a = meta_param_ex[ param_j, "d_0_a"],
+#'                              d_1_a = meta_param_ex[ param_j, "d_1_a" ],
+#'                              d_0_b = meta_param_ex[ param_j, "d_0_b" ],
+#'                              d_1_b = meta_param_ex[ param_j, "d_1_b" ],
+#'                              eta = meta_param_ex[ param_j, "eta" ],
+#'                              kappa = meta_param_ex[ param_j, "kappa" ],
+#'                              delta = meta_param_ex[ param_j, "delta" ],
+#'                              
+#'                              d_0_z = meta_param_ex[ param_j, "d_0_z" ],
+#'                              d_1_z = meta_param_ex[ param_j, "d_1_z" ],
+#'                              d_0_mu = meta_param_ex[ param_j, "d_0_mu" ],
+#'                              d_1_mu = meta_param_ex[ param_j, "d_1_mu" ] )
 #' # Summary of clustering results
-#' summary(cluster_estim_Ic)
+#' summary(cluster_ex)
 #'
 #' # Representation of clustering results
-#' plot(cluster_estim_Ic,type="heatmap")
-#' plot(cluster_estim_Ic,type="chain")
+#' plot(cluster_ex,type="heatmap")
+#' plot(cluster_ex,type="chain")
 #'
 #' # Comparison with the original clusters in the simulated data
-#' plot(x=jitter(sim.cluster.data$cluster),
-#'      y=jitter(cluster_estim_Ic$cluster),
+#' plot(x=jitter(Z_latent_ex_5_1$cluster),
+#'      y=jitter(cluster_ex$cluster),
 #'      main="",
 #'      xlab="Real cluster",
 #'      ylab="Model cluster",
 #'      pch=19, col="#FF000020")
-#'
 #' }
-#'
-#'
-#' ### Exercise (IIb) from section 5.1 in Carmona et al. (2016)
-#' ### Two binary and one continuous variables
-#' \dontrun{
-#' set.seed(0) # for reproducibility
-#'
-#' Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=3)
-#' colnames(Y_data) <- paste("Y",1:3,sep=".")
-#' Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
-#' Y_data[,2] <- sim.cluster.data[,3]
-#' Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
-#'
-#' cluster_estim_IIb <- MIXclustering( Y_data,
-#'                           var_type=c("o","c","o"),
-#'                           n.iter_out=1000,
-#'                           n.burn=200,
-#'                           n.thin=2,
-#'                           alpha=0.5,
-#'                           d_0_a = 1, d_1_a = 1,
-#'                           d_0_b = 1, d_1_b = 1,
-#'                           d_0_z = 1, d_1_z = 1,
-#'                           d_0_mu = 1, d_1_mu = 1
-#'                           )
-#'
-#' summary(cluster_estim_IIb)
-#' plot(cluster_estim_IIb,type="heatmap")
-#' plot(cluster_estim_IIb,type="chain")
-#'
-#' }
-#'
-#'
-#' ### Exercise (IIIa) from section 5.1 in Carmona et al. (2016)
-#' ### Two binary, one ordinal, and one (non-informative) continuous variables
-#' \dontrun{
-#' set.seed(0) # for reproducibility
-#'
-#' Y_data <- matrix(NA,nrow=nrow(sim.cluster.data),ncol=4)
-#' colnames(Y_data) <- paste("Y",1:4,sep=".")
-#' Y_data[,1] <- findInterval( sim.cluster.data[,2], c(-Inf,5,Inf) )-1
-#' Y_data[,2] <- findInterval( sim.cluster.data[,3], c(-Inf,4,5,Inf) )-1
-#' Y_data[,3] <- findInterval( sim.cluster.data[,4], c(-Inf,3,Inf) )-1
-#' Y_data[,4] <- rnorm(n=nrow(sim.cluster.data),mean=0,sd=1)
-#'
-#' cluster_estim_IIIa <- MIXclustering( Y_data,
-#'                           var_type=c("o","o","o","c"),
-#'                           n.iter_out=1000,
-#'                           n.burn=200,
-#'                           n.thin=2,
-#'                           alpha=0.5,
-#'                           d_0_a = 1, d_1_a = 1,
-#'                           d_0_b = 1, d_1_b = 1,
-#'                           d_0_z = 0.1, d_1_z = 0.1,
-#'                           d_0_mu = 0.1, d_1_mu = 0.1
-#'                           )
-#'
-#' summary(cluster_estim_IIIa)
-#' plot(cluster_estim_IIIa,type="heatmap")
-#' plot(cluster_estim_IIIa,type="chain")
-#'
-#' }
-#'
 #'
 #' ##### Testing "MIXclustering" function with poverty.data #####
 #' # Using entity 15 (Edomex) #
@@ -244,7 +194,7 @@
 #' sampling_prob_pov_iii <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
 #' sampling_prob_pov_iii <- sampling_prob_pov_iii * 1/poverty.data[aux_subset,"factor_hog"]
 #'
-#' cluster_estim_pov_iii <- MIXclustering(x=Y_data,
+#' cluster_estim_pov_iii <- MIXclustering( x=Y_data,
 #'                              var_type=c("c","o","o","o","o","o","o","m","m"),
 #'                              n.iter_out=1000,
 #'                              n.burn=200,
@@ -253,8 +203,7 @@
 #'                              d_0_b = 1, d_1_b = 1,
 #'                              d_0_z = 2.1, d_1_z = 30,
 #'                              d_0_mu = 2.1, d_1_mu = 30,
-#'                              sampling_prob = sampling_prob_pov_iii
-#'                              )
+#'                              sampling_prob = sampling_prob_pov_iii )
 #'
 #' summary(cluster_estim_pov_iii)
 #' plot(cluster_estim_pov_iii,type="heatmap")
@@ -262,7 +211,7 @@
 #' }
 #'
 #' @references
-#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2016). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
+#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
 #'
 #' @importFrom stats aggregate as.formula cor rgamma rmultinom sd
 #' @import plyr
@@ -620,8 +569,7 @@ MIXclustering <- function( x,
           
           if( any(c(D_0,D_values)-c(D_0_aux,D_values_aux)>1e-7) ) {
             cat('\nError: There is a problem with "D_r" in the simulation of mu_Z')
-            browser()
-            #stop('There is a problem with "D_r" in the simulation of mu_Z')
+            stop('There is a problem with "D_r" in the simulation of mu_Z')
           }
         }
       } else {
@@ -868,7 +816,6 @@ MIXclustering <- function( x,
           }
           # j<-1
           shape_gamma <- d_0_z + (n/2)
-          browser()
           rate_gamma <- d_1_z + (1/2) * sum( (1/sampling_prob) * ( Z[,j,drop=F] - mu_star[mu_star_map,j,drop=F] )^2 )
           Lambda_new[j,j] <- 1/rgamma(n=1,shape=shape_gamma,rate=rate_gamma)
         }
@@ -999,7 +946,7 @@ MIXclustering <- function( x,
 
     pb$step()
 
-    if( (!is.null(log_file) & (iter_i%%100)==0) || (iter_i==n.iter) ) {
+    if( !is.null(log_file) & ( ((iter_i%%100)==0) || (iter_i==n.iter) ) ) {
       cat( as.character(iter_i)," , ",difftime(time1=Sys.time(),time2=log_clock,units="mins")," , ",as.character(Sys.time())," \n",
            file=log_file, append=TRUE )
     }

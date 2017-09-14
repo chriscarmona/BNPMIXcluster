@@ -1,7 +1,7 @@
 Package: BNPMIXcluster
 Type: Package
 Title: Bayesian Nonparametric Model for Clustering with Mixed Scale Variables
-Version: 1.1.2
+Version: 1.1.3
 Authors@R: c(person("Christian", "Carmona", role = c("aut", "cre"), email = "carmona@stats.ox.ac.uk"),
              person("Luis", "Nieto-Barajas", role = "aut", email = " lnieto@itam.mx"),
              person("Antonio", "Canale", role = "ctb", email = "antonio.canale@unito.it")
