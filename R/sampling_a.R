@@ -1,119 +1,82 @@
-#' Simulation of "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.
-#'
-#' @description
-#' Generates simulation of the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
-#' The simulation is done via Metropolis-Hastings method.
-#'
-#' @param n number of simulations to generate
-#' @param a.ini initialization value
-#' @param b parameter \eqn{b} in the posterior distribution of a
-#' @param alpha parameter \eqn{\alpha} in the posterior distribution of a
-#' @param d_0_a parameter \eqn{d_0^a} in the posterior distribution of a
-#' @param d_1_a parameter \eqn{d_1^a} in the posterior distribution of a
-#' @param mu_star_n_r bla
-#' @param n.burn number of iterations in the simulation considered in the burn-in period.
-#' @param n.thin number of iterations discarded between two simulated values (for thinning of the MCMC chain).
-#' @param max.time maximum allowed time for the simulation process. The function returns \code{Error} if exceeded.
-#' @param verbose if \code{T}, the function reports extra information on progress.
-#'
-#' @return A list with two elements:
-#' \describe{
-#'   \item{$a.chain}{A numeric vector with the simulated values from the posterior distribution of \emph{a}}
-#'   \item{$accept.indic}{A numeric vector with the simulated values from the posterior distribution of \emph{a}}
-#' }
-#'
-#' @references
-#' Carmona C., Nieto-Barajas L., Canale A. (2016). \emph{Model based approach for household clustering with mixed scale variables.}
-#'
-#' @importFrom stats rbinom
-#'
 
-sampling_a <- function( n=1, a.ini,
+# MH Sampling from 'a' #
+sampling_a <- function( n_sim_mh=1, a_ini,
                         b, alpha, d_0_a, d_1_a,
                         mu_star_n_r,
-                        n.burn=0,n.thin=0,
-                        max.time=Inf,
-                        verbose=F) {
+                        max_it_time=10*60,burn_in=0,
+                        accept_display=F,verbose=F) {
 
-  # Metropolis-Hastings for 'a' #
-  # MH Sampling from 'a' #
-
-  if( a.ini<0 | a.ini>1 ){
-    cat('\nError: the value for "a.ini" has to be in [0,1) \n')
-    stop('the value for "a.ini" has to be in [0,1)') }
-  if( (b+a.ini)<0 ){
-    cat('\nError: the value for "b" has to be greater than -a.ini \n')
-    stop('the value for "b" has to be greater than -a.ini')
+  if( a_ini<0 | a_ini>1 ){
+    cat('\nError: the value for "a_ini" has to be in [0,1) \n')
+    stop('the value for "a_ini" has to be in [0,1)') }
+  if( (b+a_ini)<0 ){
+    cat('\nError: the value for "b" has to be greater than -a_ini \n')
+    stop('the value for "b" has to be greater than -a_ini')
   }
 
   # browser()
 
-  #n.obs <- sum(mu_star_n_r)
-  #r <- length(mu_star_n_r)
+  n <- sum(mu_star_n_r)
+  r <- length(mu_star_n_r)
 
   # initializing the chain #
-  a.chain <- as.numeric(NULL)
-  accept.indic <- as.logical(NULL)
-  a <- a.ini
+  a_chain <- a_ini
+  accept_indic <- as.numeric(NA)
 
   it_t_0 <- Sys.time()
   it_t_i <- as.numeric(Sys.time()-it_t_0)
 
-  # total number of iterations
-  n.iter <- n.burn + 1 + (n-1)*(n.thin+1)
-
-  while( ( length(a.chain) < n.iter ) & (it_t_i<max.time) ) {
-
+  while( (length(a_chain)-1 < (n_sim_mh+burn_in)) & (it_t_i<max_it_time) ) {
     if(verbose) {cat(".")}
     it_t_i <- as.numeric(Sys.time()-it_t_0)
 
     # generate proposal "a_new"
     if(b>0){
-      a.prop <- rbinom( n=1, size=1, prob=1-alpha )
-      a.prop <- ifelse( a.prop==0, 0, runif(n=1,min=0,max=1) )
+      a_prop <- rbinom( n=1, size=1, prob=1-alpha )
+      a_prop <- ifelse( a_prop==0, 0, runif(n=1,min=0,max=1) )
     } else {
-      a.prop <- runif(n=1,min=max(0,-b),max=1)
+      a_prop <- runif(n=1,min=max(0,-b),max=1)
     }
 
 
     # posterior probability for the current value of a
-    log_f_post_a <- log_f_post_a(a=a,
+    log_f_post_a_curr <- log_f_post_a(a=a_chain[length(a_chain)],
                                       b=b,
                                       alpha=alpha,
                                       d_0_a=d_0_a,d_1_a=d_1_a,
                                       mu_star_n_r=mu_star_n_r)
 
     # posterior probability for the proposal value of a
-    log_f_post_a.prop <- log_f_post_a(a=a.prop,
+    log_f_post_a_prop <- log_f_post_a(a=a_prop,
                                       b=b,
                                       alpha=alpha,
                                       d_0_a=d_0_a,d_1_a=d_1_a,
                                       mu_star_n_r=mu_star_n_r)
 
-    log_r <- log_f_post_a.prop - log_f_post_a
+    log_r <- log_f_post_a_prop - log_f_post_a_curr
     # exp(log_r)
 
     #if( runif(1,0,1) > lik_ratio ) {
     if(is.na(log_r)) {browser()}
     if( log_r>=0 || runif(1,0,1) < exp(log_r) ) {
-      a <- a.prop
-      a.chain <- c( a.chain, a.prop )
-      accept.indic <- c(accept.indic,T)
+      a_chain <- c( a_chain, a_prop )
+      accept_indic <- c(accept_indic,1)
+      if(verbose) {cat(length(unique(a_chain))-1)}
     } else {
-      a.chain <- c( a.chain, a )
-      accept.indic <- c(accept.indic,F)
+      a_chain <- c( a_chain, a_chain[length(a_chain)] )
+      accept_indic <- c(accept_indic,0)
     }
   }
 
-  if(it_t_i>max.time) {
-    cat('Error: TIMEOUT, There is a problem simulating from "a" \n')
-    stop('TIMEOUT, There is a problem simulating from "a"')
+  if(it_t_i>max_it_time) {
+    cat('Error: There is a problem simulating from "a" \n')
+    stop('There is a problem simulating from "a"')
   }
-
-  index.iter.out <- seq(from=n.burn+1,to=n.iter,by=(n.thin+1))
-
-  a.sim <- list( a.chain = a.chain[index.iter.out],
-                 accept.indic = accept.indic )
-
-  return( a.sim )
+  #browser()
+  if(accept_display) {
+    return( list( a_chain = a_chain[(burn_in+2):length(a_chain)],
+                  accept_indic = accept_indic[(burn_in+2):length(accept_indic)] ) )
+  } else {
+    return( a_chain[(burn_in+2):length(a_chain)] )
+  }
 }

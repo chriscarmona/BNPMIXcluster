@@ -1,12 +1,9 @@
-#' @importFrom stats dgamma
-sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
+# MH Sampling from 'sigma_j' #
+sampling_sigma_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
                         d_0_z, d_1_z, kappa=1,
-                        Z, mu_Z, sigma_Z, sampling_prob,
-                        max.time=10*60,n.burn=0,
-                        accept_display=T, verbose=F) {
-
-  ###     Metropolis-Hastings for variances of sigma_Z given by 'Lambda'     ###
-  # MH Sampling from 'sigma_jk' #
+                        Z, mu_Z, sigma_Z, design_prob,
+                        max_it_time=10*60,burn_in=0,
+                        accept_display=F, verbose=F) {
 
   n <- nrow(Z)
 
@@ -17,7 +14,7 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
   it_t_0 <- Sys.time()
   it_t_i <- as.numeric(Sys.time()-it_t_0)
 
-  while( (length(sigma_jj_chain)-1 < (n_sim_mh+n.burn)) & (it_t_i<max.time) ) {
+  while( (length(sigma_jj_chain)-1 < (n_sim_mh+burn_in)) & (it_t_i<max_it_time) ) {
     if(verbose) {cat(".")}
 
     it_t_i <- as.numeric(Sys.time()-it_t_0)
@@ -28,14 +25,14 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
     #browser()
 
     # posterior probability for the current value of a
-    log_f_post_sigma_jj_curr <- log_f_post_Lambda_jj(sigma_jj=sigma_jj_chain[length(sigma_jj_chain)],
-                                                     d_0_z=d_0_z,d_1_z=d_1_z,
-                                                     Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, sampling_prob=sampling_prob)
+    log_f_post_sigma_jj_curr <- log_f_post_sigma_jj(sigma_jj=sigma_jj_chain[length(sigma_jj_chain)],
+                                                  d_0_z=d_0_z,d_1_z=d_1_z,
+                                                  Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, design_prob=design_prob)
 
     # posterior probability for the proposal value of a
-    log_f_post_sigma_jj_prop <- log_f_post_Lambda_jj(sigma_jj=sigma_jj_prop,
-                                                     d_0_z=d_0_z,d_1_z=d_1_z,
-                                                     Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, sampling_prob=sampling_prob)
+    log_f_post_sigma_jj_prop <- log_f_post_sigma_jj(sigma_jj=sigma_jj_prop,
+                                                  d_0_z=d_0_z,d_1_z=d_1_z,
+                                                  Z=Z, mu_Z=mu_Z, sigma_Z=sigma_Z, design_prob=design_prob)
 
     log_r <- (log_f_post_sigma_jj_prop - log_f_post_sigma_jj_curr) + ( dgamma( x=sigma_jj_chain[length(sigma_jj_chain)], shape=kappa, rate=kappa/sigma_jj_prop, log=T )
                                                                      -dgamma( x=sigma_jj_prop, shape=kappa, rate=kappa/sigma_jj_chain[length(sigma_jj_chain)], log=T )
@@ -53,7 +50,7 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
     }
   }
 
-  if(it_t_i>max.time) {
+  if(it_t_i>max_it_time) {
     cat('\nError: There is a problem simulating from "sigma_j_prop" \n')
     stop('There is a problem simulating from "sigma_j_prop"')
   }
@@ -61,10 +58,9 @@ sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
   #browser()
   if(accept_display) {
     #browser()
-    return( list( sigma_jj = sigma_jj_chain[(n.burn+2):length(sigma_jj_chain)],
-                  accept_indic = accept_indic[(n.burn+2):length(accept_indic)] ) )
+    return( list( sigma_jj = sigma_jj_chain[(burn_in+2):length(sigma_jj_chain)],
+                  accept_indic = accept_indic[(burn_in+2):length(accept_indic)] ) )
   } else {
-    return( sigma_jj_chain[(n.burn+2):length(sigma_jj_chain)] )
+    return( sigma_jj_chain[(burn_in+2):length(sigma_jj_chain)] )
   }
 }
-

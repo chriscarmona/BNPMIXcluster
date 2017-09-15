@@ -1,12 +1,10 @@
 
+# MH Sampling from 'b' #
 sampling_b <- function( n_sim_mh=1, b_ini,
                         a, d_0_b, d_1_b, eta=1,
                         mu_star_n_r,
-                        max.time=10*60, n.burn=0,
-                        accept_display=T, verbose=F) {
-
-  ###     Metropolis-Hastings for 'b'     ###
-  # MH Sampling from 'b' #
+                        max_it_time=10*60, burn_in=0,
+                        accept_display=F, verbose=F) {
 
   n <- sum(mu_star_n_r)
   r <- length(mu_star_n_r)
@@ -26,7 +24,7 @@ sampling_b <- function( n_sim_mh=1, b_ini,
   it_t_0 <- Sys.time()
   it_t_i <- as.numeric(Sys.time()-it_t_0)
 
-  while( (length(b_chain)-1 < (n_sim_mh+n.burn)) & (it_t_i<max.time) ) {
+  while( (length(b_chain)-1 < (n_sim_mh+burn_in)) & (it_t_i<max_it_time) ) {
     if(verbose) {cat(".")}
     it_t_i <- as.numeric(Sys.time()-it_t_0)
 
@@ -68,15 +66,15 @@ sampling_b <- function( n_sim_mh=1, b_ini,
     }
   }
 
-  if(it_t_i>max.time) {
+  if(it_t_i>max_it_time) {
     cat('\nError: There is a problem simulating from "sigma_jk" \n')
     stop('There is a problem simulating from "sigma_jk"')
   }
   #browser()
   if(accept_display) {
-    return( list( b_chain = b_chain[(n.burn+2):length(b_chain)],
-                  accept_indic = accept_indic[(n.burn+2):length(accept_indic)] ) )
+    return( list( b_chain = b_chain[(burn_in+2):length(b_chain)],
+                  accept_indic = accept_indic[(burn_in+2):length(accept_indic)] ) )
   } else {
-    return( b_chain[(n.burn+2):length(b_chain)] )
+    return( b_chain[(burn_in+2):length(b_chain)] )
   }
 }

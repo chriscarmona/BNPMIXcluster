@@ -1,19 +1,14 @@
-#' @importFrom stats dbeta
-#'
 
+# target distribution: log-posterior distribution of 'a' #
 log_f_post_a <- function(a,
                          b,
                          alpha,d_0_a,d_1_a,
                          mu_star_n_r) {
 
-  # Metropolis-Hastings for 'a' #
-  # target distribution: log-posterior distribution of 'a' #
-
   if( a<0 | a>1 ){
     cat('\nError: The value for "a" has to be in [0,1)\n')
     stop('The value for "a" has to be in [0,1)')
   }
-
   #if( (b+a)<0 ){ browser() }
   if( (b+a)<0 ){
     cat('\nError: The value for "b" has to be greater than -a \n')
