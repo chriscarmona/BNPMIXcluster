@@ -4,14 +4,14 @@
 \alias{MIXclustering}
 \title{Bayesian Nonparametric Model for Clustering with Mixed Scale Variables}
 \usage{
-MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
+MIXclustering(Y, var_type, n_iter_out = 2000, n_burn = 100, n_thin = 2,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
   d_0_b = 1, d_1_b = 1, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
-  expansion_f = NULL, max.time = Inf, USING_CPP = TRUE, log_file = NULL)
+  expansion_f = NULL, log_file = NULL)
 }
 \arguments{
-\item{x}{Matrix or data frame containing the data to be clustered.}
+\item{Y}{Matrix or data frame containing the data to be clustered.}
 
 \item{var_type}{Character vector that indicates the type of variable in each column of x. Three possible types:
 \itemize{
@@ -20,11 +20,11 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
 
-\item{n.iter_out}{Number of effective iterations in the MCMC procedure for clustering.}
+\item{n_iter_out}{Number of effective iterations in the MCMC procedure for clustering.}
 
-\item{n.burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
+\item{n_burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
-\item{n.thin}{Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n.thin iterations.}
+\item{n_thin}{Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.}
 
 \item{a_fix}{A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.}
 
@@ -57,10 +57,6 @@ MIXclustering(x, var_type, n.iter_out = 1000, n.burn = 100, n.thin = 2,
 \item{sampling_prob}{vector with the sampling probabilities \eqn{\pi_i} for each individual in case that the data come from a complex survey sample. By default \eqn{\pi_i=1}.}
 
 \item{expansion_f}{vector with the expansion factors, the reciprocal of the sampling probabilities, \eqn{w_i = 1/\pi_i}. If both \code{sampling_prob} and \code{expansion_f} are specified, preference is given to \code{sampling_prob}.}
-
-\item{max.time}{Maximum time tolerated to be spend in the sampling procedure of the Metropolis-Hastings steps. If reached the routine is stopped with \code{error}.}
-
-\item{USING_CPP}{Indicates wheter to use optimized functions developed in C++ (TRUE default)}
 
 \item{log_file}{Specifies a file to save the details with the execution time and the parameters used.}
 }
@@ -158,18 +154,19 @@ ex_i <- 1
 
 # specification of parameters #
 help(meta_param_ex)
-# Choose "a", "b" or "v" #
+# Choose "a", "b" or "c" #
 param_j <- "c"
 
 var_type_Y_ex_5_1 <- list( c("c","c","c"),
                            c("o","o"),
                            c("o","o","o","c") )
 \dontrun{
-cluster_ex <- MIXclustering( x = as.matrix(Y_ex_5_1[[ ex_i ]]),
+cluster_ex <- MIXclustering( Y = as.matrix(Y_ex_5_1[[ ex_i ]]),
                              var_type=var_type_Y_ex_5_1[[ ex_i ]],
-                             n.iter_out=1500,
-                             n.burn=200,
-                             n.thin=3,
+                             
+                             n_iter_out=1500,
+                             n_burn=200,
+                             n_thin=3,
                              
                              alpha = meta_param_ex[ param_j, "alpha" ],
                              d_0_a = meta_param_ex[ param_j, "d_0_a"],
@@ -224,11 +221,11 @@ Y_data <- poverty.data[aux_subset,Y_names]
 sampling_prob_pov_iii <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
 sampling_prob_pov_iii <- sampling_prob_pov_iii * 1/poverty.data[aux_subset,"factor_hog"]
 
-cluster_estim_pov_iii <- MIXclustering( x=Y_data,
+cluster_estim_pov_iii <- MIXclustering( Y=Y_data,
                              var_type=c("c","o","o","o","o","o","o","m","m"),
-                             n.iter_out=1000,
-                             n.burn=200,
-                             n.thin=2,
+                             n_iter_out=1000,
+                             n_burn=200,
+                             n_thin=2,
                              d_0_a = 1, d_1_a = 1,
                              d_0_b = 1, d_1_b = 1,
                              d_0_z = 2.1, d_1_z = 30,

@@ -1,13 +1,10 @@
 
+# MH Sampling from 'b' #
 sampling_b <- function( n_sim_mh=1, b_ini,
                         a, d_0_b, d_1_b, eta=1,
                         mu_star_n_r,
-                        max.time=10*60, n.burn=0,
-                        accept_display=T, verbose=F,
-                        USING_CPP=TRUE ) {
-
-  ###     Metropolis-Hastings for 'b'     ###
-  # MH Sampling from 'b' #
+                        max_it_time=10*60, n_burn=0,
+                        accept_display=F, verbose=F) {
 
   n <- sum(mu_star_n_r)
   r <- length(mu_star_n_r)
@@ -27,7 +24,7 @@ sampling_b <- function( n_sim_mh=1, b_ini,
   it_t_0 <- Sys.time()
   it_t_i <- as.numeric(Sys.time()-it_t_0)
 
-  while( (length(b_chain)-1 < (n_sim_mh+n.burn)) & (it_t_i<max.time) ) {
+  while( (length(b_chain)-1 < (n_sim_mh+n_burn)) & (it_t_i<max_it_time) ) {
     if(verbose) {cat(".")}
     it_t_i <- as.numeric(Sys.time()-it_t_0)
 
@@ -41,29 +38,18 @@ sampling_b <- function( n_sim_mh=1, b_ini,
     b_prop_interval <- c(max(-a,b_chain[length(b_chain)]-eta),b_chain[length(b_chain)]+eta)
     b_prop <- runif(1,b_prop_interval[1],b_prop_interval[2])
 
-    # posterior probability for the current and proposed value of b
-    if( USING_CPP ) {
-      log_f_post_b_curr <- log_f_post_b_cpp(b=b_chain[length(b_chain)],
-                                            a=a,
-                                            d_0_b=d_0_b,d_1_b=d_1_b,
-                                            mu_star_n_r=mu_star_n_r)
-      log_f_post_b_prop <- log_f_post_b_cpp(b=b_prop,
-                                            a=a,
-                                            d_0_b=d_0_b,d_1_b=d_1_b,
-                                            mu_star_n_r=mu_star_n_r)
-    } else {
-      log_f_post_b_curr <- log_f_post_b( b = b_chain[length(b_chain)],
-                                         a = a,
-                                         d_0_b = d_0_b,
-                                         d_1_b = d_1_b,
-                                         mu_star_n_r = mu_star_n_r )
-      log_f_post_b_prop <- log_f_post_b( b = b_prop,
-                                         a = a,
-                                         d_0_b = d_0_b,
-                                         d_1_b = d_1_b,
-                                         mu_star_n_r = mu_star_n_r )
-    }
-    
+    # posterior probability for the current value of b
+    log_f_post_b_curr <- log_f_post_b(b=b_chain[length(b_chain)],
+                                      a=a,
+                                      d_0_b=d_0_b,d_1_b=d_1_b,
+                                      mu_star_n_r=mu_star_n_r)
+
+    # posterior probability for the proposal value of b
+    log_f_post_b_prop <- log_f_post_b(b=b_prop,
+                                      a=a,
+                                      d_0_b=d_0_b,d_1_b=d_1_b,
+                                      mu_star_n_r=mu_star_n_r)
+
     b_cur_interval_given_prop <- c(max(-a,b_prop-eta),b_prop+eta)
 
     log_r <- (log_f_post_b_prop - log_f_post_b_curr) + ( log(1/diff(b_cur_interval_given_prop)) - log(1/diff(b_prop_interval)) )
@@ -80,17 +66,15 @@ sampling_b <- function( n_sim_mh=1, b_ini,
     }
   }
 
-  if(it_t_i>max.time) {
+  if(it_t_i>max_it_time) {
     cat('\nError: There is a problem simulating from "sigma_jk" \n')
     stop('There is a problem simulating from "sigma_jk"')
   }
   #browser()
   if(accept_display) {
-    return( list( b_chain = b_chain[(n.burn+2):length(b_chain)],
-                  accept_indic = accept_indic[(n.burn+2):length(accept_indic)] ) )
+    return( list( b_chain = b_chain[(n_burn+2):length(b_chain)],
+                  accept_indic = accept_indic[(n_burn+2):length(accept_indic)] ) )
   } else {
-    return( b_chain[(n.burn+2):length(b_chain)] )
+    return( b_chain[(n_burn+2):length(b_chain)] )
   }
 }
-
-sampling_b <- compiler::cmpfun(sampling_b)

@@ -5,27 +5,3 @@ dmvnrm_arma <- function(x, mean, sigma, logd = FALSE) {
     .Call('_BNPMIXcluster_dmvnrm_arma', PACKAGE = 'BNPMIXcluster', x, mean, sigma, logd)
 }
 
-rtn1 <- function(mean, sd, low, high) {
-    .Call('_BNPMIXcluster_rtn1', PACKAGE = 'BNPMIXcluster', mean, sd, low, high)
-}
-
-get_latents_cpp <- function(Y, var_type, mu_Z, sigma_Z, Z_ini, verbose = FALSE) {
-    .Call('_BNPMIXcluster_get_latents_cpp', PACKAGE = 'BNPMIXcluster', Y, var_type, mu_Z, sigma_Z, Z_ini, verbose)
-}
-
-log_f_post_a_cpp <- function(a, b, alpha, d_0_a, d_1_a, mu_star_n_r) {
-    .Call('_BNPMIXcluster_log_f_post_a_cpp', PACKAGE = 'BNPMIXcluster', a, b, alpha, d_0_a, d_1_a, mu_star_n_r)
-}
-
-log_f_post_b_cpp <- function(b, a, d_0_b, d_1_b, mu_star_n_r) {
-    .Call('_BNPMIXcluster_log_f_post_b_cpp', PACKAGE = 'BNPMIXcluster', b, a, d_0_b, d_1_b, mu_star_n_r)
-}
-
-log_f_post_Lambda_jj_cpp <- function(sigma_jj, d_0_z, d_1_z, Z, mu_Z, sigma_Z, sampling_prob) {
-    .Call('_BNPMIXcluster_log_f_post_Lambda_jj_cpp', PACKAGE = 'BNPMIXcluster', sigma_jj, d_0_z, d_1_z, Z, mu_Z, sigma_Z, sampling_prob)
-}
-
-log_f_post_Omega_cpp <- function(Omega, Z, mu_Z, sampling_prob, Lambda) {
-    .Call('_BNPMIXcluster_log_f_post_Omega_cpp', PACKAGE = 'BNPMIXcluster', Omega, Z, mu_Z, sampling_prob, Lambda)
-}
-

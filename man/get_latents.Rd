@@ -4,8 +4,7 @@
 \alias{get_latents}
 \title{Simulation of latent variables \eqn{Z} in the \emph{mixdpclust} model}
 \usage{
-get_latents(Y, var_type, mu_Z.ini = NULL, sigma_Z.ini = NULL,
-  Z.ini = NULL)
+get_latents(Y, var_type, mu_Z = NULL, sigma_Z = NULL, Z_old = NULL)
 }
 \arguments{
 \item{Y}{Matrix or data frame containing the observed data.}
@@ -17,11 +16,11 @@ get_latents(Y, var_type, mu_Z.ini = NULL, sigma_Z.ini = NULL,
   \item "\strong{m}" for nominal variables (non-ordered categorical).
 }}
 
-\item{mu_Z.ini}{an optional vector with the expected values \eqn{\mu_Z} of the latent variables.}
+\item{mu_Z}{an optional vector with the expected values \eqn{\mu_Z} of the latent variables.}
 
-\item{sigma_Z.ini}{an optional matrix with the covariance matrix \eqn{\Sigma_Z} of the latent variables.}
+\item{sigma_Z}{an optional matrix with the covariance matrix \eqn{\Sigma_Z} of the latent variables.}
 
-\item{Z.ini}{an optional matrix with initial values for the latent variables that will be simulated.}
+\item{Z_old}{an optional matrix with initial values for the latent variables that will be simulated.}
 }
 \description{
 Simulates values for latent variables \eqn{Z=(Z_1,...,Z_q)} according to the specification in the \emph{mixdpclust} model.

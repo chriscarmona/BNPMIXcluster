@@ -26,5 +26,3 @@ log_f_post_b <- function( b,
   
   return(log_post)
 }
-
-log_f_post_b <- compiler::cmpfun(log_f_post_b)
