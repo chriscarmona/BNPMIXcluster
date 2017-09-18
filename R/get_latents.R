@@ -17,7 +17,8 @@
 #' @param mu_Z an optional vector with the expected values \eqn{\mu_Z} of the latent variables.
 #' @param sigma_Z an optional matrix with the covariance matrix \eqn{\Sigma_Z} of the latent variables.
 #' @param Z_old an optional matrix with initial values for the latent variables that will be simulated.
-#'
+#' @param USING_CPP indicates usage of C++ in some modules.
+#' 
 #' @importFrom stats diffinv model.matrix pnorm qnorm relevel runif
 #' @importFrom MASS ginv
 #'
@@ -32,7 +33,8 @@ get_latents <- function( Y,
                          var_type,
                          mu_Z=NULL,
                          sigma_Z=NULL,
-                         Z_old=NULL ) {
+                         Z_old=NULL,
+                         USING_CPP=TRUE ) {
   
   ### This function simulates the latent variables for a specified Y ###
   
@@ -227,7 +229,12 @@ get_latents <- function( Y,
           }
         }
         
-        if(T) {
+        if(USING_CPP) {
+          Z[i,n_c+j] <- rtn1( mean=mu_Z_aux,
+                              sd=sqrt(sigma_Z_aux),
+                              low=thres_o[[j]][cat_ij],
+                              high=thres_o[[j]][cat_ij+1] )
+        } else {
           Z[i,n_c+j] <- truncnorm::rtruncnorm( n=1,
                                                a=thres_o[[j]][cat_ij], b=thres_o[[j]][cat_ij+1],
                                                mean=mu_Z_aux,

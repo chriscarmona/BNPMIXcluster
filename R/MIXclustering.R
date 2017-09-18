@@ -255,8 +255,8 @@ MIXclustering <- function( Y,
                            
                            log_file=NULL ) {
   
-  review_MH_chain=FALSE
-  max_it_time=Inf
+  USING_CPP = TRUE
+  max.time=Inf
   
   #on.exit(browser())
   
@@ -370,7 +370,9 @@ MIXclustering <- function( Y,
   }
   
   #####     Simulating latent variables 'Z' from 'Y'     #####
-  latents_info <- get_latents( Y, var_type )
+  latents_info <- get_latents( Y=Y,
+                               var_type=var_type,
+                               USING_CPP=USING_CPP )
   
   Z <- latents_info$Z
   
@@ -478,7 +480,7 @@ MIXclustering <- function( Y,
   
   ##### Monitoring acceptance rate for MH #####
   
-  if(review_MH_chain) {
+  
     
     Lambda_sim <- matrix(as.numeric(NA),nrow=n_iter,ncol=ncol(sigma_Z) )
     Omega_sim <- array(as.numeric(NA),dim=c(nrow(sigma_Z),ncol(sigma_Z),n_iter))
@@ -490,19 +492,7 @@ MIXclustering <- function( Y,
     a_accept <- as.numeric(NULL)
     b_accept <- as.numeric(NULL)
     
-  } else {
-    
-    Lambda_sim <- NULL
-    Omega_sim <- NULL
-    a_sim <- NULL
-    b_sim <- NULL
-    
-    Lambda_accept <- NULL
-    Omega_accept <- NULL
-    a_accept <- NULL
-    b_accept <- NULL
-    
-  }
+  
   
   #if(dev_verbose) {
   cat("*** Clustering estimation started ***\n")
@@ -698,17 +688,12 @@ MIXclustering <- function( Y,
       aux_Lambda <-  sampling_Lambda_jj( n_sim_mh=1, sigma_jj_ini=Lambda_new[j_sigma,j_sigma]^2,j=j_sigma,
                                          d_0_z=d_0_z, d_1_z=d_1_z, kappa=kappa,
                                          Z=Z, mu_Z=mu_star[mu_star_map,,drop=F], sigma_Z=sigma_Z_new, sampling_prob=sampling_prob,
-                                         max_it_time=10*60,n_burn=0,
-                                         accept_display=review_MH_chain, verbose=F)
+                                         max.time=max.time,n.burn=0,
+                                         verbose=F,
+                                         USING_CPP=USING_CPP )
       
-      if(review_MH_chain) {
-        Lambda_new[j_sigma,j_sigma] <- sqrt(aux_Lambda[[1]])
-        Lambda_accept[iter_i,j_sigma] <- aux_Lambda[[2]]
-      } else {
-        Lambda_new[j_sigma,j_sigma] <- sqrt(aux_Lambda[[1]])
-        #hist(aux_Lambda,50)
-        #abline(v=Lambda_new[j_sigma,j_sigma]^2,col="red")
-      }
+      Lambda_new[j_sigma,j_sigma] <- sqrt(aux_Lambda[[1]])
+      Lambda_accept[iter_i,j_sigma] <- aux_Lambda[[2]]
       
       # Element with unitary variance in Lambda_new
       # diag(Lambda_new)[aux_var1_Z] <- 1
@@ -747,8 +732,9 @@ MIXclustering <- function( Y,
           if(dev_verbose) {
             cat('(',i_omega,',',j_omega,') ',sep='')
           }
-          aux_omega_ij_new <- sampling_Omega_ij( n_sim_mh=1,
-                                                 Omega_ini=Omega_new,
+          
+          aux_omega_ij_new <- sampling_Omega_ij( n=1,
+                                                 Omega.ini=Omega_new,
                                                  i=i_omega,
                                                  j=j_omega,
                                                  delta=delta,
@@ -756,24 +742,20 @@ MIXclustering <- function( Y,
                                                  mu_Z=mu_star[mu_star_map,,drop=F],
                                                  Lambda=Lambda_new,
                                                  sampling_prob=sampling_prob,
-                                                 max_it_time=10*60,
-                                                 n_burn=0,
-                                                 accept_display=review_MH_chain,
-                                                 verbose=F )
+                                                 n.burn=0,
+                                                 n.thin=0,
+                                                 max.time=max.time,
+                                                 USING_CPP=USING_CPP )
           
-          if(review_MH_chain) {
-            omega_ij_new <- aux_omega_ij_new[[1]]
-            Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
-          } else {
-            #hist(aux_omega_ij_new,50)
-            #abline(v=Omega_new[i_omega,j_omega],col="red")
-            omega_ij_new <- aux_omega_ij_new
-          }
+          
+          omega_ij_new <- aux_omega_ij_new[[1]]
+          Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
           
           Omega_new[i_omega,j_omega] <- Omega_new[j_omega,i_omega] <- omega_ij_new
           if(dev_verbose) {
             if(j_omega==(i_omega-1)) {cat('\n')}
           }
+          
           if( !matrixcalc::is.positive.definite(Omega_new) ) {
             cat("     Process finished because 'Omega_new' is not positive definite!\n");
             return()
@@ -818,25 +800,22 @@ MIXclustering <- function( Y,
     }
     
     # (f) Sampling "a"
-    if(dev_verbose) {
-      cat( 'Sampling "a":\n' )
-    }
+    
     if(is.null(a_fix)){
-      aux_a_new <- sampling_a( n_sim_mh=1, a_ini=a,
+      
+      if(dev_verbose) {
+        cat( 'Sampling "a":\n' )
+      }
+      
+      aux_a_new <- sampling_a( n=1, a.ini=a,
                                b=b, alpha=alpha, d_0_a=d_0_a, d_1_a=d_1_a,
                                mu_star_n_r=mu_star_n_r,
-                               max_it_time=max_it_time, n_burn=0,
-                               accept_display=review_MH_chain, verbose=F )
+                               max.time=max.time, n.burn=0,
+                               verbose=F,
+                               USING_CPP=USING_CPP)
       
-      #plot(a_new)
-      #hist(a_new)
-      
-      if(review_MH_chain) {
-        a_new <- aux_a_new[[1]]
-        a_accept <- c(a_accept, aux_a_new[[2]])
-      } else {
-        a_new <- aux_a_new
-      }
+      a_new <- aux_a_new$a.chain
+      a_accept <- c( a_accept , aux_a_new$accept.indic )
       
     } else {
       a_new <- a_fix
@@ -855,21 +834,16 @@ MIXclustering <- function( Y,
       if(dev_verbose) {
         cat( 'Sampling "b":\n' )
       }
+      
       aux_b_new <- sampling_b( n_sim_mh=1, b_ini=b,
                                a=a, d_0_b=d_0_b, d_1_b=d_1_b,
                                mu_star_n_r=mu_star_n_r,
-                               max_it_time=max_it_time, n_burn=0, eta=eta,
-                               accept_display=review_MH_chain, verbose=F )
+                               max.time=max.time, n.burn=0, eta=eta,
+                               verbose=F,
+                               USING_CPP=USING_CPP )
       
-      #plot(b_new)
-      #hist(b_new)
-      
-      if (review_MH_chain) {
-        b_new <- aux_b_new[[1]]
-        b_accept <- c(b_accept, aux_b_new[[2]])
-      } else {
-        b_new <- aux_b_new
-      }
+      b_new <- aux_b_new[[1]]
+      b_accept <- c(b_accept, aux_b_new[[2]])
       
       if(!all(b_new>-a)){stop('There is a problem sampling from "b", it should be >-a\nb=',b,"\n-a=",-a,sep="")}
       
@@ -892,10 +866,9 @@ MIXclustering <- function( Y,
                           var_type,
                           mu_Z=mu_star[mu_star_map,,drop=F],
                           sigma_Z=sigma_Z,
-                          Z_old=Z)$Z
-    #Z <- Z_new
-    #browser()
-    #Z <- get_latents( Y, var_type, mu_Z=mu_star[mu_star_map,], sigma_Z=sigma_Z, Z_old=Z )$Z
+                          Z_old=Z,
+                          USING_CPP=USING_CPP)$Z
+    
     if(dev_verbose) {
       cat('...Done! \n')
     }
@@ -907,19 +880,10 @@ MIXclustering <- function( Y,
     mu_star_map_sim[,paste("iter_",iter_i,sep="")] <- mu_star_map
     #mu_star_n_r_sim[[iter_i]] <- mu_star_n_r
     
-    
-    if(review_MH_chain) {
-      Lambda_sim[iter_i,] <- diag(Lambda)
-      Omega_sim[,,iter_i] <- Omega
-      a_sim[iter_i] <- a
-      b_sim[iter_i] <- b
-      
-    } else {
-      Lambda_sim <- NULL
-      Omega_sim[,,iter_i] <- NULL
-      a_sim <- NULL
-      b_sim <- NULL
-    }
+    Lambda_sim[iter_i,] <- diag(Lambda)
+    Omega_sim[,,iter_i] <- Omega
+    a_sim[iter_i] <- a
+    b_sim[iter_i] <- b
     
     time_sim[iter_i+1] <- Sys.time()
     

@@ -1,8 +1,10 @@
 #include <RcppArmadillo.h>
+// [[Rcpp::depends("RcppArmadillo")]]
+
+// [[Rcpp::interfaces(r, cpp)]]
 
 const double log2pi = std::log(2.0 * M_PI);
 
-// [[Rcpp::depends("RcppArmadillo")]]
 // [[Rcpp::export]]
 arma::vec dmvnrm_arma(arma::mat x,
                       arma::rowvec mean,
