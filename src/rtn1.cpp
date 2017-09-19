@@ -12,7 +12,7 @@ inline bool CheckSimple(const double low, ///< lower bound of distribution
                         const double high ///< upper bound of distribution
 ) {
   // Init Values Used in Inequality of Interest
-  double val1 = (2 * sqrt(exp(1))) / (low + sqrt(pow(low, 2) + 4));
+  double val1 = (2 * sqrt(exp(1.0))) / (low + sqrt(pow(low, 2) + 4));
   double val2 = exp((pow(low, 2) - low * sqrt(pow(low, 2) + 4)) / (4)) ;
   //
   
