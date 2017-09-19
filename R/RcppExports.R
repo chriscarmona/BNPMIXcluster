@@ -5,6 +5,10 @@ dmvnrm_arma <- function(x, mean, sigma, logd = FALSE) {
     .Call('_BNPMIXcluster_dmvnrm_arma', PACKAGE = 'BNPMIXcluster', x, mean, sigma, logd)
 }
 
+get_latents_cpp <- function(Y, var_type, mu_Z, sigma_Z, Z_ini, verbose = FALSE) {
+    .Call('_BNPMIXcluster_get_latents_cpp', PACKAGE = 'BNPMIXcluster', Y, var_type, mu_Z, sigma_Z, Z_ini, verbose)
+}
+
 log_f_post_a_cpp <- function(a, b, alpha, d_0_a, d_1_a, mu_star_n_r) {
     .Call('_BNPMIXcluster_log_f_post_a_cpp', PACKAGE = 'BNPMIXcluster', a, b, alpha, d_0_a, d_1_a, mu_star_n_r)
 }

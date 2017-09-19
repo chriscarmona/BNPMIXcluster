@@ -42,6 +42,22 @@ RcppExport SEXP _BNPMIXcluster_dmvnrm_arma(SEXP xSEXP, SEXP meanSEXP, SEXP sigma
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// get_latents_cpp
+arma::mat get_latents_cpp(arma::mat Y, arma::ucolvec var_type, arma::mat mu_Z, arma::mat sigma_Z, arma::mat Z_ini, bool verbose);
+RcppExport SEXP _BNPMIXcluster_get_latents_cpp(SEXP YSEXP, SEXP var_typeSEXP, SEXP mu_ZSEXP, SEXP sigma_ZSEXP, SEXP Z_iniSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::ucolvec >::type var_type(var_typeSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type mu_Z(mu_ZSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type sigma_Z(sigma_ZSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Z_ini(Z_iniSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_latents_cpp(Y, var_type, mu_Z, sigma_Z, Z_ini, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // log_f_post_a_cpp
 double log_f_post_a_cpp(double a, double b, double alpha, double d_0_a, double d_1_a, arma::colvec mu_star_n_r);
 RcppExport SEXP _BNPMIXcluster_log_f_post_a_cpp(SEXP aSEXP, SEXP bSEXP, SEXP alphaSEXP, SEXP d_0_aSEXP, SEXP d_1_aSEXP, SEXP mu_star_n_rSEXP) {
@@ -107,17 +123,36 @@ END_RCPP
 }
 // rtn1
 double rtn1(const double mean, const double sd, const double low, const double high);
-RcppExport SEXP _BNPMIXcluster_rtn1(SEXP meanSEXP, SEXP sdSEXP, SEXP lowSEXP, SEXP highSEXP) {
+static SEXP _BNPMIXcluster_rtn1_try(SEXP meanSEXP, SEXP sdSEXP, SEXP lowSEXP, SEXP highSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const double >::type mean(meanSEXP);
     Rcpp::traits::input_parameter< const double >::type sd(sdSEXP);
     Rcpp::traits::input_parameter< const double >::type low(lowSEXP);
     Rcpp::traits::input_parameter< const double >::type high(highSEXP);
     rcpp_result_gen = Rcpp::wrap(rtn1(mean, sd, low, high));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _BNPMIXcluster_rtn1(SEXP meanSEXP, SEXP sdSEXP, SEXP lowSEXP, SEXP highSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_BNPMIXcluster_rtn1_try(meanSEXP, sdSEXP, lowSEXP, highSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 
 // validate (ensure exported C++ functions exist before calling them)
@@ -125,6 +160,7 @@ static int _BNPMIXcluster_RcppExport_validate(const char* sig) {
     static std::set<std::string> signatures;
     if (signatures.empty()) {
         signatures.insert("arma::vec(*dmvnrm_arma)(arma::mat,arma::rowvec,arma::mat,bool)");
+        signatures.insert("double(*rtn1)(const double,const double,const double,const double)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -132,12 +168,14 @@ static int _BNPMIXcluster_RcppExport_validate(const char* sig) {
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _BNPMIXcluster_RcppExport_registerCCallable() { 
     R_RegisterCCallable("BNPMIXcluster", "_BNPMIXcluster_dmvnrm_arma", (DL_FUNC)_BNPMIXcluster_dmvnrm_arma_try);
+    R_RegisterCCallable("BNPMIXcluster", "_BNPMIXcluster_rtn1", (DL_FUNC)_BNPMIXcluster_rtn1_try);
     R_RegisterCCallable("BNPMIXcluster", "_BNPMIXcluster_RcppExport_validate", (DL_FUNC)_BNPMIXcluster_RcppExport_validate);
     return R_NilValue;
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BNPMIXcluster_dmvnrm_arma", (DL_FUNC) &_BNPMIXcluster_dmvnrm_arma, 4},
+    {"_BNPMIXcluster_get_latents_cpp", (DL_FUNC) &_BNPMIXcluster_get_latents_cpp, 6},
     {"_BNPMIXcluster_log_f_post_a_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_a_cpp, 6},
     {"_BNPMIXcluster_log_f_post_b_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_b_cpp, 5},
     {"_BNPMIXcluster_log_f_post_Lambda_jj_cpp", (DL_FUNC) &_BNPMIXcluster_log_f_post_Lambda_jj_cpp, 7},

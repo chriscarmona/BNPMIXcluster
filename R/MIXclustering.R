@@ -122,12 +122,15 @@
 #' @examples
 #' 
 #' ##############################
-#' #        Exercise 5.1        #
+#' #     Simulation study 1     #
 #' #    Carmona et al. (2017)   #
 #' ##############################
-#' set.seed(0) # for reproducibility
-#' ### This example ilustrate the use of the function MIXclustering  ###
+#' 
 #' # Data and parameters are discussed in section 5.1 of Carmona et al. (2017) #
+#' 
+#' # Set seed for reproducibility #
+#' set.seed(0) 
+#' 
 #' 
 #' # Specification of data Y #
 #' help(Y_ex_5_1)
@@ -186,37 +189,75 @@
 #'      pch=19, col="#FF000080")
 #' }
 #'
-#'
-#' ##### Testing "MIXclustering" function with poverty.data #####
-#' # Using entity 15 (Edomex) #
+#' ##############################
+#' #      Households data       #
+#' #    Carmona et al. (2017)   #
+#' ##############################
+#' 
+#' # Testing "MIXclustering" function with poverty.data #
+#' # Data and parameters are discussed in section 5.3 of Carmona et al. (2017) #
+#' 
+#' # Set seed for reproducibility #
+#' set.seed(0) 
+#' 
 #'
 #' \dontrun{
+#' # relevant variables for clustering households #
 #' Y_names <- c("ict_norm",
 #'              "ic_ali","ic_asalud","ic_cv",
 #'              "ic_rezedu","ic_sbv","ic_segsoc",
 #'              "niv_ed","tam_loc")
+#' Y_var_type <- c("c","o","o","o","o","o","o","o","m")
+#' 
+#' # using only data from state 15 (Edomex) #
 #' aux_subset <- rep(T,nrow(poverty.data))
 #' aux_subset <- aux_subset & is.element(substr(poverty.data$folioviv,1,2),"15")
 #'
 #' Y_data <- poverty.data[aux_subset,Y_names]
 #'
-#' sampling_prob_pov_iii <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
-#' sampling_prob_pov_iii <- sampling_prob_pov_iii * 1/poverty.data[aux_subset,"factor_hog"]
-#'
-#' cluster_estim_pov_iii <- MIXclustering( Y=Y_data,
-#'                              var_type=c("c","o","o","o","o","o","o","m","m"),
-#'                              n_iter_out=1000,
-#'                              n_burn=200,
-#'                              n_thin=2,
-#'                              d_0_a = 1, d_1_a = 1,
-#'                              d_0_b = 1, d_1_b = 1,
-#'                              d_0_z = 2.1, d_1_z = 30,
-#'                              d_0_mu = 2.1, d_1_mu = 30,
-#'                              sampling_prob = sampling_prob_pov_iii )
-#'
-#' summary(cluster_estim_pov_iii)
-#' plot(cluster_estim_pov_iii,type="heatmap")
-#' plot(cluster_estim_pov_iii,type="chain")
+#' ### Sampling probability dependin on the scenario ###
+#' # Scenario description in section 5.3 of Carmona et al. (2017) #
+#' # Choose 1, 2 or 3 #
+#' poverty_sampling_spec <- 3
+#' 
+#' file_name <- paste("cluster_coneval_edomex_",c("i","ii","iii")[poverty_sampling_spec],sep="")
+#' 
+#' if (poverty_sampling_spec == 1) {
+#'   k <- 1
+#'   sampling_prob_pov <- rep(1,nrow(Y_data))
+#' } else if (poverty_sampling_spec == 2) {
+#'   k <- 2 * mean(poverty.data[aux_subset,"factor_hog"])
+#'   sampling_prob_pov <- 1/poverty.data[aux_subset,"factor_hog"]
+#' } else if (poverty_sampling_spec == 3) {
+#'   k <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
+#'   sampling_prob_pov <- 1/poverty.data[aux_subset,"factor_hog"]
+#' }
+#' 
+#' 
+#' cluster_poverty <- MIXclustering( Y=Y_data,
+#'                                   var_type=Y_var_type,
+#'                                   n_iter_out=1500,
+#'                                   n_burn=200,
+#'                                   n_thin=3,
+#'                                   
+#'                                   alpha = 0.5,
+#'                                   d_0_a = 1, d_1_a = 1,
+#'                                   d_0_b = 1, d_1_b = 1,
+#'                                   
+#'                                   eta = 2,
+#'                                   kappa = 5,
+#'                                   delta = 4,
+#'                                   
+#'                                   d_0_z = 2.1, d_1_z = 30,
+#'                                   d_0_mu = 2.1, d_1_mu = 30,
+#'                                   
+#'                                   sampling_prob = k * sampling_prob_pov,
+#'                                   
+#'                                   log_file=paste(out_dir,file_name,"_log.txt",sep="") )
+#' 
+#' summary(cluster_poverty)
+#' plot(cluster_poverty,type="heatmap")
+#' plot(cluster_poverty,type="chain")
 #' }
 #'
 #' @references
@@ -254,6 +295,8 @@ MIXclustering <- function( Y,
                            expansion_f=NULL,
                            
                            log_file=NULL ) {
+  
+  if( !any( c(is.matrix(Y),is.data.frame(Y)) ) ) { stop("Y has to be a Matrix or data frame, with each column representing a variable, and each row representing an individual") }
   
   USING_CPP = TRUE
   max.time=Inf
@@ -296,8 +339,6 @@ MIXclustering <- function( Y,
   #####
   n_iter <- n_burn + 1 + (n_iter_out-1)*(n_thin)
   
-  # Y <- data.frame( as.matrix(Y) )
-  
   # possible variable classes that are allowed
   var_type_all <- c("c","o","m")
   
@@ -326,13 +367,62 @@ MIXclustering <- function( Y,
   var_type <- var_type[Y_new_order]
   Y <- Y[,Y_new_order,drop=F]
   
+  ##### Missing data #####
+  # Only consider rows with complete information, i.e. no missing data allowed
+  aux_na_Y <- apply(!is.na(Y),1,all)
+  
+  Y <- Y[aux_na_Y,,drop=F]
+  if(sum(!aux_na_Y)>0){
+    cat(sum(!aux_na_Y),' rows with missing data were removed\n')
+  }
+  
+  # vector for returning Z to Y incorporating back the NAs
+  map_z_to_orig <-cumsum(aux_na_Y)
+  map_z_to_orig[duplicated(map_z_to_orig)]<-NA
+  
   n <- nrow(Y)
   p <- ncol(Y)
   
-  # number of variables by type
+  # continuous latent variables
   n_c <- sum( is.element( var_type, var_type_all[1] ) )
+  # ordinal latent variables (categorical, ordered)
   n_o <- sum( is.element( var_type, var_type_all[2] ) )
+  # nominal variables (categorical, unordered)
   n_m <- sum( is.element( var_type, var_type_all[3] ) )
+  # nominal latent variables (categorical, unordered)
+  n_m_l = rep(NA,n_m)
+  if(n_m>0) {
+    for (i in 1:n_m ) {
+      # i=1
+      aux_i = which( is.element( var_type, var_type_all[3] ) )[i]
+      # k-1 latents are needed for a categorical variable with k categories
+      n_m_l[i] = length(unique(Y[,aux_i]))-1
+    }
+    rm(i,aux_i)
+  }
+  # total number of latent variables in Z
+  n_q <- n_c+n_o+sum(n_m_l)
+  
+  
+  ### Transforms Y to numerical matrix ###
+  Y_numerical <- matrix(NA,nrow(Y),ncol(Y))
+  if( n_c>0 ) {
+    for(j in which(is.element( var_type, var_type_all[1] ))) {
+      Y_numerical[,j] <- as.numeric(Y[,j])
+    }
+  }
+  if( n_o>0 ) {
+    for(j in which(is.element( var_type, var_type_all[2] ))) {
+      Y_numerical[,j] <- match(Y[,j],sort(unique(Y[,j])))
+    }
+  }
+  if( n_m>0 ) {
+    for(j in which(is.element( var_type, var_type_all[3] ))) {
+      Y_numerical[,j] <- match(Y[,j],sort(unique(Y[,j])))
+    }
+  }
+  Y <- Y_numerical
+  rm(Y_numerical,j)
   
   # changes the colnames of Y for simplicity and standarization
   
@@ -370,34 +460,18 @@ MIXclustering <- function( Y,
   }
   
   #####     Simulating latent variables 'Z' from 'Y'     #####
-  latents_info <- get_latents( Y=Y,
-                               var_type=var_type,
-                               USING_CPP=USING_CPP )
-  
-  Z <- latents_info$Z
-  
-  #n_c <- latents_info$n_c
-  #n_o <- latents_info$n_o
-  n_m_l <- latents_info$n_m_l
-  n_q <- n_c+n_o+sum(n_m_l)
-  #n_q==latents_info$n_q # TRUE
-  #K_o <- latents_info$K_o
-  rm(latents_info)
-  
-  ##### Missing data #####
-  # Only consider rows with complete information, i.e. no missing data allowed
-  aux_na_Y <- apply(!is.na(Z),1,all)
-  
-  Z <- Z[aux_na_Y,,drop=F]
-  if(sum(!aux_na_Y)>0){
-    cat(sum(!aux_na_Y),' rows with missing data were removed\n')
+  if(FALSE) {
+    # DANGER: This is not ready yet! #
+    Z <- get_latents_cpp( Y=as.matrix(Y),
+                          var_type = match(var_type,var_type_all),
+                          mu_Z = matrix(0,nrow=n,ncol=n_q),
+                          sigma_Z = diag(1,nrow=n_q,ncol=n_q),
+                          Z_ini = matrix(0,1,1) )
+  } else {
+    Z <- get_latents( Y=Y,
+                      var_type=var_type,
+                      USING_CPP=USING_CPP )$Z
   }
-  
-  # vector for returning Z to Y incorporating back the NAs
-  map_z_to_orig <-cumsum(aux_na_Y)
-  map_z_to_orig[duplicated(map_z_to_orig)]<-NA
-  
-  n <- dim(Z)[1]
   
   ##### Start: Initializing the chain #####
   
@@ -862,13 +936,21 @@ MIXclustering <- function( Y,
       cat( 'Sampling "Z_ij":\n' )
     }
     
-    Z_new <- get_latents( Y,
-                          var_type,
-                          mu_Z=mu_star[mu_star_map,,drop=F],
-                          sigma_Z=sigma_Z,
-                          Z_old=Z,
-                          USING_CPP=USING_CPP)$Z
-    
+    if( FALSE ) {
+      # DANGER: This is not ready yet! #
+      Z_new <- get_latents_cpp( Y = as.matrix(Y),
+                                var_type = match(var_type, var_type_all),
+                                mu_Z = mu_star[mu_star_map,,drop=F],
+                                sigma_Z = sigma_Z,
+                                Z_ini = Z )
+    } else {
+      Z_new <- get_latents( Y=Y,
+                            var_type=var_type,
+                            mu_Z=mu_star[mu_star_map,,drop=F],
+                            sigma_Z=sigma_Z,
+                            Z_old=Z,
+                            USING_CPP=USING_CPP)$Z
+    }
     if(dev_verbose) {
       cat('...Done! \n')
     }

@@ -44,6 +44,25 @@ namespace BNPMIXcluster {
         return Rcpp::as<arma::vec >(rcpp_result_gen);
     }
 
+    inline double rtn1(const double mean, const double sd, const double low, const double high) {
+        typedef SEXP(*Ptr_rtn1)(SEXP,SEXP,SEXP,SEXP);
+        static Ptr_rtn1 p_rtn1 = NULL;
+        if (p_rtn1 == NULL) {
+            validateSignature("double(*rtn1)(const double,const double,const double,const double)");
+            p_rtn1 = (Ptr_rtn1)R_GetCCallable("BNPMIXcluster", "_BNPMIXcluster_rtn1");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_rtn1(Shield<SEXP>(Rcpp::wrap(mean)), Shield<SEXP>(Rcpp::wrap(sd)), Shield<SEXP>(Rcpp::wrap(low)), Shield<SEXP>(Rcpp::wrap(high)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<double >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_BNPMIXcluster_RCPPEXPORTS_H_GEN_

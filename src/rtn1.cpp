@@ -160,6 +160,8 @@ inline double UseAlg3(const double low, ///< lower bound of distribution
 /// Doi: 10.1007/BF00143942 <br />
 ///
 
+
+// [[Rcpp::interfaces(r, cpp)]]
 // [[Rcpp::export]]
 double rtn1(const double mean,
             const double sd,
