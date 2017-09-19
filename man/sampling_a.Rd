@@ -29,6 +29,8 @@ sampling_a(n = 1, a.ini, b, alpha, d_0_a, d_1_a, mu_star_n_r, n.burn = 0,
 \item{max.time}{maximum allowed time for the simulation process. The function returns \code{Error} if exceeded.}
 
 \item{verbose}{if \code{T}, the function reports extra information on progress.}
+
+\item{USING_CPP}{indicates usage of C++ in some modules.}
 }
 \value{
 A list with two elements:

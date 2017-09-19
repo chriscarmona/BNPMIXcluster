@@ -15,7 +15,8 @@
 #' @param n.thin number of iterations discarded between two simulated values (for thinning of the MCMC chain).
 #' @param max.time maximum allowed time for the simulation process. The function returns \code{Error} if exceeded.
 #' @param verbose if \code{T}, the function reports extra information on progress.
-#'
+#' @param USING_CPP indicates usage of C++ in some modules.
+#' 
 #' @return A list with two elements:
 #' \describe{
 #'   \item{$a.chain}{A numeric vector with the simulated values from the posterior distribution of \emph{a}}
@@ -80,29 +81,29 @@ sampling_a <- function( n=1, a.ini,
     
     # posterior probability for the current value of a
     if(USING_CPP) {
-      log_f_post_a <- log_f_post_a_cpp(a=a,
-                                       b=b,
-                                       alpha=alpha,
-                                       d_0_a=d_0_a,d_1_a=d_1_a,
-                                       mu_star_n_r=mu_star_n_r)
-      
-      log_f_post_a.prop <- log_f_post_a_cpp(a=a.prop,
-                                            b=b,
-                                            alpha=alpha,
-                                            d_0_a=d_0_a,d_1_a=d_1_a,
-                                            mu_star_n_r=mu_star_n_r)
-    } else {
-      log_f_post_a <- log_f_post_a(a=a,
-                                   b=b,
-                                   alpha=alpha,
-                                   d_0_a=d_0_a,d_1_a=d_1_a,
-                                   mu_star_n_r=mu_star_n_r)
-      
-      log_f_post_a.prop <- log_f_post_a(a=a.prop,
+      log_f_post_a <- log_f_post_a_cpp( a=a,
                                         b=b,
                                         alpha=alpha,
                                         d_0_a=d_0_a,d_1_a=d_1_a,
-                                        mu_star_n_r=mu_star_n_r)
+                                        mu_star_n_r=mu_star_n_r )
+      
+      log_f_post_a.prop <- log_f_post_a_cpp( a=a.prop,
+                                             b=b,
+                                             alpha=alpha,
+                                             d_0_a=d_0_a,d_1_a=d_1_a,
+                                             mu_star_n_r=mu_star_n_r )
+    } else {
+      log_f_post_a <- log_f_post_a( a=a,
+                                    b=b,
+                                    alpha=alpha,
+                                    d_0_a=d_0_a,d_1_a=d_1_a,
+                                    mu_star_n_r=mu_star_n_r )
+      
+      log_f_post_a.prop <- log_f_post_a( a=a.prop,
+                                         b=b,
+                                         alpha=alpha,
+                                         d_0_a=d_0_a,d_1_a=d_1_a,
+                                         mu_star_n_r=mu_star_n_r )
     }
     # posterior probability for the proposal value of a
     

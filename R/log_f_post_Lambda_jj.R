@@ -1,13 +1,12 @@
+###     Metropolis-Hastings for variances of sigma_Z given by 'Lambda'     ###
 
+# target distribution: log-posterior distribution of 'sigma_jj' #
 log_f_post_Lambda_jj <- function(sigma_jj,
                          d_0_z,d_1_z,
                          Z, mu_Z, sigma_Z, sampling_prob
                          ) {
 
-  ###     Metropolis-Hastings for variances of sigma_Z given by 'Lambda'     ###
-  # target distribution: log-posterior distribution of 'sigma_jj' #
-
-  if(any(dim(Z)!=dim(mu_Z))) {
+  if(all(dim(Z)==!dim(mu_Z))) {
     cat('\nError: Problem simulating sigma: Dimension of Z and mu_Z are not equal \n')
     stop('Problem simulating sigma: Dimension of Z and mu_Z are not equal')
   }
@@ -25,5 +24,3 @@ log_f_post_Lambda_jj <- function(sigma_jj,
 
   return(log_f_post_sigma_j)
 }
-
-log_f_post_Lambda_jj <- compiler::cmpfun(log_f_post_Lambda_jj)
