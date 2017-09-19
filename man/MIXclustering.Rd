@@ -238,7 +238,6 @@ Y_data <- poverty.data[aux_subset,Y_names]
 # Choose 1, 2 or 3 #
 poverty_sampling_spec <- 3
 
-file_name <- paste("cluster_coneval_edomex_",c("i","ii","iii")[poverty_sampling_spec],sep="")
 
 if (poverty_sampling_spec == 1) {
   k <- 1
@@ -250,7 +249,6 @@ if (poverty_sampling_spec == 1) {
   k <- 4 * mean(poverty.data[aux_subset,"factor_hog"])
   sampling_prob_pov <- 1/poverty.data[aux_subset,"factor_hog"]
 }
-
 
 cluster_poverty <- MIXclustering( Y=Y_data,
                                   var_type=Y_var_type,
@@ -269,9 +267,7 @@ cluster_poverty <- MIXclustering( Y=Y_data,
                                   d_0_z = 2.1, d_1_z = 30,
                                   d_0_mu = 2.1, d_1_mu = 30,
                                   
-                                  sampling_prob = k * sampling_prob_pov,
-                                  
-                                  log_file=paste(out_dir,file_name,"_log.txt",sep="") )
+                                  sampling_prob = k * sampling_prob_pov )
 
 summary(cluster_poverty)
 plot(cluster_poverty,type="heatmap")
