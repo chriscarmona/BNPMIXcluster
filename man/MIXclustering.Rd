@@ -8,7 +8,7 @@ MIXclustering(Y, var_type, n_iter_out = 2000, n_burn = 100, n_thin = 2,
   a_fix = NULL, alpha = 0.5, d_0_a = 1, d_1_a = 1, b_fix = NULL,
   d_0_b = 1, d_1_b = 1, eta = 2, d_0_z = 2.1, d_1_z = 30, kappa = 5,
   delta = 4, d_0_mu = 2.1, d_1_mu = 30, sampling_prob = NULL,
-  expansion_f = NULL, log_file = NULL)
+  expansion_f = NULL, log_file = NULL, keep_param_chains = FALSE)
 }
 \arguments{
 \item{Y}{Matrix or data frame containing the data to be clustered.}

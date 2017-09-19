@@ -290,7 +290,8 @@ MIXclustering <- function( Y,
                            sampling_prob=NULL,
                            expansion_f=NULL,
                            
-                           log_file=NULL ) {
+                           log_file=NULL,
+                           keep_param_chains=FALSE ) {
   
   if( !any( c(is.matrix(Y),is.data.frame(Y)) ) ) { stop("Y has to be a Matrix or data frame, with each column representing a variable, and each row representing an individual") }
   
@@ -446,6 +447,12 @@ MIXclustering <- function( Y,
       cat('\nError: There is an inconsistency between "sampling_prob" and the number of rows in "Y"\n')
       stop('There is an inconsistency between "sampling_prob" and the number of rows in "Y"')
     }
+  } else {
+    if(is.null(expansion_f)) {
+    expansion_f <- 1/sampling_prob
+    } else {
+      stop('Only one of "sampling_prob" or "expansion_f" should be specified')
+    }
   }
   
   #sampling_prob <- sampling_prob/sum(sampling_prob) # should add up 1
@@ -550,18 +557,27 @@ MIXclustering <- function( Y,
   
   ##### Monitoring acceptance rate for MH #####
   
-  
-    
+  if(keep_param_chains) {
     Lambda_sim <- matrix(as.numeric(NA),nrow=n_iter,ncol=ncol(sigma_Z) )
     Omega_sim <- array(as.numeric(NA),dim=c(nrow(sigma_Z),ncol(sigma_Z),n_iter))
     a_sim <- as.numeric(NULL)
     b_sim <- as.numeric(NULL)
     
-    Lambda_accept <- matrix(as.numeric(NA),nrow=n_iter,ncol=ncol(sigma_Z) )
-    Omega_accept <- array(as.numeric(NA),dim=c(nrow(sigma_Z),ncol(sigma_Z),n_iter))
-    a_accept <- as.numeric(NULL)
-    b_accept <- as.numeric(NULL)
+    #Lambda_accept <- matrix(as.numeric(NA),nrow=n_iter,ncol=ncol(sigma_Z) )
+    #Omega_accept <- array(as.numeric(NA),dim=c(nrow(sigma_Z),ncol(sigma_Z),n_iter))
+    #a_accept <- as.numeric(NULL)
+    #b_accept <- as.numeric(NULL)
+  } else {
+    Lambda_sim <- NULL
+    Omega_sim <- NULL
+    a_sim <- NULL
+    b_sim <- NULL
     
+    #Lambda_accept <- NULL
+    #Omega_accept <- NULL
+    #a_accept <- NULL
+    #b_accept <- NULL
+  }
   
   
   #if(dev_verbose) {
@@ -763,7 +779,7 @@ MIXclustering <- function( Y,
                                          USING_CPP=USING_CPP )
       
       Lambda_new[j_sigma,j_sigma] <- sqrt(aux_Lambda[[1]])
-      Lambda_accept[iter_i,j_sigma] <- aux_Lambda[[2]]
+      #Lambda_accept[iter_i,j_sigma] <- aux_Lambda[[2]]
       
       # Element with unitary variance in Lambda_new
       # diag(Lambda_new)[aux_var1_Z] <- 1
@@ -819,7 +835,7 @@ MIXclustering <- function( Y,
           
           
           omega_ij_new <- aux_omega_ij_new[[1]]
-          Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
+          #Omega_accept[i_omega,j_omega,iter_i] <- Omega_accept[j_omega,i_omega,iter_i] <- aux_omega_ij_new[[2]]
           
           Omega_new[i_omega,j_omega] <- Omega_new[j_omega,i_omega] <- omega_ij_new
           if(dev_verbose) {
@@ -885,11 +901,11 @@ MIXclustering <- function( Y,
                                USING_CPP=USING_CPP)
       
       a_new <- aux_a_new$a.chain
-      a_accept <- c( a_accept , aux_a_new$accept.indic )
+      #a_accept <- c( a_accept , aux_a_new$accept.indic )
       
     } else {
       a_new <- a_fix
-      a_accept <- NULL
+      #a_accept <- NULL
     }
     
     a <- a_new
@@ -913,13 +929,13 @@ MIXclustering <- function( Y,
                                USING_CPP=USING_CPP )
       
       b_new <- aux_b_new[[1]]
-      b_accept <- c(b_accept, aux_b_new[[2]])
+      #b_accept <- c(b_accept, aux_b_new[[2]])
       
       if(!all(b_new>-a)){stop('There is a problem sampling from "b", it should be >-a\nb=',b,"\n-a=",-a,sep="")}
       
     } else {
       b_new <- b_fix
-      b_accept <- NULL
+      #b_accept <- NULL
     }
     b <- b_new
     if(dev_verbose) {
@@ -958,10 +974,12 @@ MIXclustering <- function( Y,
     mu_star_map_sim[,paste("iter_",iter_i,sep="")] <- mu_star_map
     #mu_star_n_r_sim[[iter_i]] <- mu_star_n_r
     
-    Lambda_sim[iter_i,] <- diag(Lambda)
-    Omega_sim[,,iter_i] <- Omega
-    a_sim[iter_i] <- a
-    b_sim[iter_i] <- b
+    if(keep_param_chains) {
+      Lambda_sim[iter_i,] <- diag(Lambda)
+      Omega_sim[,,iter_i] <- Omega
+      a_sim[iter_i] <- a
+      b_sim[iter_i] <- b
+    }
     
     time_sim[iter_i+1] <- Sys.time()
     
@@ -1074,6 +1092,7 @@ MIXclustering <- function( Y,
     nr<-table(cluster)[1:nc]
     
     hmm<-matrix(NA,nc,q)
+    
     for (i in 1:nc){
       # i <- 1
       for (j in 1:q){
