@@ -27,22 +27,35 @@
 #' \code{\link{MIXclustering}}
 #'
 #' @importFrom graphics abline barplot hist layout par plot
-#' @importFrom stats heatmap
-#'
+#' @importFrom grDevices colorRamp rgb
+#' @importFrom gplots heatmap.2
+#' 
 #' @export
 
-plot.MIXcluster <- function(x,
-                            type=c("heatmap","chain")[1],
-                            chain.obj=c("n.cluster","a","b","Lambda","Omega","all")[1],
-                            ...
-                            ) {
-
+plot.MIXcluster <- function( x,
+                             type=c("heatmap","chain")[1],
+                             chain.obj=c("n.cluster","a","b","Lambda","Omega","all")[1],
+                             ... ) {
+  
   if(is.element("heatmap",type)) {
-    heatmap(1-x$cluster.matrix.avg)
+    ramp <- grDevices::colorRamp(c("white","blue"))
+    blue <- grDevices::rgb( ramp(seq(0, 1, length = 25)), max = 255)
+    gplots::heatmap.2( x$cluster.matrix.avg,
+                       dendrogram='none',
+                       key=FALSE,
+                       #key.title=NA,
+                       keysize=0.1,
+                       Rowv=TRUE,
+                       Colv=TRUE,
+                       trace='none',
+                       density.info="none",
+                       margins=c(1,1),
+                       labRow="", labCol="",
+                       col=blue )
   }
-
+  
   if( is.element("chain",type) ) {
-
+    
     plot_mcmc <- function(x,...){
       op <- par()
       hist_n <- hist(x,plot=F)
@@ -53,7 +66,7 @@ plot.MIXcluster <- function(x,
       barplot( hist_n$counts,axes=F,space=0,xlim=c(0,max(hist_n$counts)),horiz=T)
       suppressWarnings(par(op))
     }
-
+    
     if( (is.element("all",chain.obj)|is.element("n.cluster",chain.obj)) ) {
       plot_mcmc(x$MC.values$n.clusters,main="Number of clusters",ylab="Number of clusters",xlab="iteration")
     }

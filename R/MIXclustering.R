@@ -40,6 +40,7 @@
 #' @param d_1_mu Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.
 #'
 #' @param log_file Specifies a file to save the details with the execution time and the parameters used.
+#' @param keep_param_chains Indicates wheter the simulations of parameters \code{a}, \code{b}, \code{lambda} and \code{omega} should be returned as output.
 #'
 #' @details
 #'
