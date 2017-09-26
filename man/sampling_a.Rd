@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_a.R
 \name{sampling_a}
 \alias{sampling_a}
-\title{Simulation of "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.}
 \usage{
 sampling_a(n = 1, a.ini, b, alpha, d_0_a, d_1_a, mu_star_n_r, n.burn = 0,
   n.thin = 0, max.time = Inf, verbose = F, USING_CPP = TRUE)
@@ -40,8 +40,8 @@ A list with two elements:
 }
 }
 \description{
-Generates simulation of the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
-The simulation is done via Metropolis-Hastings method.
+Generates a sample from the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
+  The simulation is done via Metropolis-Hastings method.
 }
 \references{
 Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}

@@ -1,4 +1,17 @@
+#' @title
+#'   MCMC sampling of parameter "\eqn{\Lambda_{j,j}}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'
+#' @description
+#'   Generates a sample from the the posterior distribution of the j-th diagonal element \eqn{(i,j)} of the \eqn{\Lambda} matrix in the \emph{mixdpcluster} model for bayesian clustering.
+#'   The simulation is done via Metropolis-Hastings method.
+#' 
+#' 
 #' @importFrom stats dgamma
+#' @importFrom compiler cmpfun
+#' 
+#' @keywords internal
+#' 
+
 sampling_Lambda_jj <- function( n_sim_mh=1, sigma_jj_ini,j,
                                 d_0_z, d_1_z, kappa=1,
                                 Z, mu_Z, sigma_Z, sampling_prob,

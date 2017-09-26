@@ -1,8 +1,9 @@
-#' Simulation of "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.
+#' @title
+#'   MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.
 #'
 #' @description
-#' Generates simulation of the posterior distribution of the \eqn{(i,j)} element of the \eqn{\Omega} matrix in the \emph{mixdpcluster} model for bayesian clustering.
-#' The simulation is done via Metropolis-Hastings method.
+#'   Generates a sample from the the posterior distribution of the \eqn{(i,j)} element of the \eqn{\Omega} matrix in the \emph{mixdpcluster} model for bayesian clustering.
+#'   The simulation is done via Metropolis-Hastings method.
 #'
 #' @param n number of simulations to be generated
 #' @param Omega.ini matrix \eqn{\Omega} with an initialization value for \eqn{\Omega_{i,j}}.
@@ -26,8 +27,11 @@
 #'
 #' @references
 #' Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
-#'
+#' 
+#' @importFrom compiler cmpfun
+#' 
 #' @keywords internal
+#' 
 
 sampling_Omega_ij <- function( n=1,Omega.ini,i,j,delta=4,
                                Z, mu_Z, Lambda, sampling_prob,

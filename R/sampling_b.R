@@ -1,3 +1,14 @@
+#' @title
+#'   MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'
+#' @description
+#'   Generates a sample from the posterior distribution of \eqn{b} in the \emph{mixdpcluster} model for bayesian clustering.
+#'   The simulation is done via Metropolis-Hastings method.
+#'   
+#' @importFrom compiler cmpfun
+#' 
+#' @keywords internal
+#' 
 
 sampling_b <- function( n_sim_mh=1, b_ini,
                         a, d_0_b, d_1_b, eta=1,

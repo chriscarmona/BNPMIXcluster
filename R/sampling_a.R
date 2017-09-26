@@ -1,8 +1,9 @@
-#' Simulation of "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.
+#' @title
+#'   MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.
 #'
 #' @description
-#' Generates simulation of the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
-#' The simulation is done via Metropolis-Hastings method.
+#'   Generates a sample from the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
+#'   The simulation is done via Metropolis-Hastings method.
 #'
 #' @param n number of simulations to generate
 #' @param a.ini initialization value
@@ -27,7 +28,8 @@
 #' Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}
 #'
 #' @importFrom stats rbinom
-#'
+#' @importFrom compiler cmpfun
+#' 
 #' @keywords internal
 
 sampling_a <- function( n=1, a.ini,

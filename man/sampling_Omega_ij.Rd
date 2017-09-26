@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_Omega_ij.R
 \name{sampling_Omega_ij}
 \alias{sampling_Omega_ij}
-\title{Simulation of "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.}
 \usage{
 sampling_Omega_ij(n = 1, Omega.ini, i, j, delta = 4, Z, mu_Z, Lambda,
   sampling_prob, n.burn = 0, n.thin = 0, max.time = Inf, verbose = F,
@@ -43,8 +43,8 @@ A list with two elements:
 }
 }
 \description{
-Generates simulation of the posterior distribution of the \eqn{(i,j)} element of the \eqn{\Omega} matrix in the \emph{mixdpcluster} model for bayesian clustering.
-The simulation is done via Metropolis-Hastings method.
+Generates a sample from the the posterior distribution of the \eqn{(i,j)} element of the \eqn{\Omega} matrix in the \emph{mixdpcluster} model for bayesian clustering.
+  The simulation is done via Metropolis-Hastings method.
 }
 \references{
 Carmona C., Nieto-Barajas L., Canale A. (2017). \emph{Model based approach for household clustering with mixed scale variables.}

@@ -12,13 +12,16 @@ LazyData: TRUE
 Depends:
     R (>= 2.10),
 Imports:
-    Rcpp,
+    compiler,
+    gplots,
+    MASS,
     matrixcalc,
-    truncnorm,
     mvtnorm,
     plyr,
-    MASS,
-    gplots
-LinkingTo: Rcpp, RcppArmadillo,
+    Rcpp,
+    truncnorm
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
 Suggests: scatterplot3d
 RoxygenNote: 6.0.1
