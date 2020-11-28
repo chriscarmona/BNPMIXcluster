@@ -46,7 +46,7 @@
 #'
 #' The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 #'
-#' Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC simulations.
+#' Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC.
 #'
 #' A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 #'
@@ -135,14 +135,16 @@
 #' 
 #' # Specification of data Y #
 #' help(Y_ex_5_1)
-#' # Choose 1, 2, or 3 #
+#' 
+#' # Observable data
+#' # Choose scenario: 1, 2, or 3
 #' ex_i <- 1
 #' 
-#' # specification of parameters #
-#' help(meta_param_ex)
-#' # Choose "a", "b" or "c" #
+#' # Prior specification
+#' # Choose "a", "b" or "c"
 #' param_j <- "c"
 #' 
+#' # Specify the data type that is being provided to the method
 #' var_type_Y_ex_5_1 <- list( c("c","c","c"),
 #'                            c("o","o"),
 #'                            c("o","o","o","c") )
@@ -170,7 +172,7 @@
 #' # Summary of clustering results
 #' summary(cluster_ex)
 #'
-#' # Representation of clustering results
+#' # Visualizing clustering results
 #' plot(cluster_ex,type="heatmap")
 #' plot(cluster_ex,type="chain")
 #' 

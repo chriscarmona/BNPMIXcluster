@@ -7,7 +7,7 @@ Authors@R: c(person("Christian", "Carmona", role = c("aut", "cre"), email = "car
              person("Luis", "Nieto-Barajas", role = "aut", email = " lnieto@itam.mx"),
              person("Antonio", "Canale", role = "ctb", email = "antonio.canale@unito.it")
              )
-Description: The package provides a model-based method for clustering capable of combining different types of variables (continuous, ordinal and nominal) and accommodating for different sampling probabilities in a complex survey design. The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables. Details of the underlying model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) <arXiv:1612.00083>.
+Description: Model-based approach for clustering of multivariate data, capable of combining different types of variables (continuous, ordinal and nominal) and accommodating for different sampling probabilities in a complex survey design. The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables. Details of the underlying model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) <arXiv:1612.00083>.
 License: MIT + file LICENSE
 URL: https://github.com/christianu7/BNPMIXcluster/
 BugReports: https://github.com/christianu7/BNPMIXcluster/issues

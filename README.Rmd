@@ -1,0 +1,182 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r preamble, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# BNPMIXcluster
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The BNPMIXcluster package provides a method for model-based clustering of multivariate data. It is capable of combining different types of variables (continuous, ordinal and nominal) and accommodating for different sampling probabilities in a complex survey design.
+
+The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables.
+
+Details of the underlying model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) [arXiv:1612.00083](https://arxiv.org/abs/1612.00083).
+
+## Installation
+
+You can install the released version of BNPMIXcluster from [CRAN](https://CRAN.R-project.org/package=BNPMIXcluster) with:
+
+``` r
+install.packages("BNPMIXcluster")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("christianu7/BNPMIXcluster")
+```
+## Examples
+
+```{r sim_study_5_1}
+require(BNPMIXcluster)
+```
+
+### Simulation study 1     
+
+We first evaluate the clustering performance of our model using synthetic iid data. Details are discussed in section 5.1 of Carmona et al. (2017).
+
+We sampled 3-dimensional latent continuous vectors z=(z1, z2, z3) from a
+3-components mixture of normals with equal mixing probabilities and mixture components with means mu_1 = (2, 2, 5), mu_2 = (6, 4, 2) and mu_3 = (1, 6, 2), and variances
+Sigma_1 = diag(1, 1, 1), Sigma_2 = diag(0.1, 2, 0.1) and Sigma_3 = diag(2, 0.1, 0.1).
+
+The plot below depicts the "True" (generative) cluster allocation with three different colors. Such grouping is unknown and we would like to discover it using our model.
+
+```{r sim_study_5_1_data, echo=FALSE, out.width="70%", fig.align="center"}
+require(scatterplot3d)
+cluster_color <- c(rgb(1,0,0,alpha = 0.5),
+                   rgb(0,0,1,alpha = 0.5),
+                   rgb(0,0.5,0,alpha = 0.5))
+cluster_color <- cluster_color[Z_latent_ex_5_1$cluster]
+cluster_pch <- c(19,15,17)[Z_latent_ex_5_1$cluster]
+par(mfrow=c(2,2))
+par(mar=c(4,5,2,2))
+
+scatterplot3d::scatterplot3d(x=Z_latent_ex_5_1$Z1,y = Z_latent_ex_5_1$Z2, z=Z_latent_ex_5_1$Z3,
+              color=cluster_color,pch=cluster_pch,
+              xlab="Z1",ylab="Z2",zlab="Z3",
+              main="Simulated data in 3 clusters"
+              )
+par(mar=c(4,5,2,2))
+plot(Z_latent_ex_5_1[,c("Z2","Z3")],col=cluster_color,pch=cluster_pch,xlab="Z2",ylab="Z3")
+par(mar=c(4,5,2,2))
+plot(Z_latent_ex_5_1[,c("Z1","Z3")],col=cluster_color,pch=cluster_pch,xlab="Z1",ylab="Z3")
+par(mar=c(4,5,2,2))
+plot(Z_latent_ex_5_1[,c("Z1","Z2")],col=cluster_color,pch=cluster_pch,xlab="Z1",ylab="Z2")
+```
+
+We tested the proposed method by considering different scenarios for the observed data that
+combine the use continuous and discretised versions of the simulated data.
+
+Here we illustrate the scenario (I), where we assume that the three continuous variables are directly observable.
+
+```{r sim_study_5_1_scenario}
+# Observable data
+# Choose scenario: 1, 2, or 3
+ex_i <- 1
+head( Y_ex_5_1[[ ex_i ]] )
+```
+
+We pre-selected hyper-parameters that entail a prior specification which promotes a small number of groups.
+
+```{r sim_study_5_1_hyperpars}
+# Prior specification
+# Choose "a", "b" or "c"
+param_j <- "c"
+meta_param_ex[ param_j, ]
+```
+
+The function `MIXclustering` performs MCMC to allocate clusters to each individual.
+
+```{r sim_study_5_1_mcmc}
+set.seed(0) 
+
+# Specify the data type that is being provided to the method
+var_type_Y_ex_5_1 <- list( c("c","c","c"),
+                           c("o","o"),
+                           c("o","o","o","c") )
+
+cluster_ex <- MIXclustering( Y = as.matrix(Y_ex_5_1[[ ex_i ]]),
+                             var_type=var_type_Y_ex_5_1[[ ex_i ]],
+                             
+                             n_iter_out=1500,
+                             n_burn=200,
+                             n_thin=3,
+                             
+                             alpha = meta_param_ex[ param_j, "alpha" ],
+                             d_0_a = meta_param_ex[ param_j, "d_0_a"],
+                             d_1_a = meta_param_ex[ param_j, "d_1_a" ],
+                             d_0_b = meta_param_ex[ param_j, "d_0_b" ],
+                             d_1_b = meta_param_ex[ param_j, "d_1_b" ],
+                             eta = meta_param_ex[ param_j, "eta" ],
+                             kappa = meta_param_ex[ param_j, "kappa" ],
+                             delta = meta_param_ex[ param_j, "delta" ],
+                             
+                             d_0_z = meta_param_ex[ param_j, "d_0_z" ],
+                             d_1_z = meta_param_ex[ param_j, "d_1_z" ],
+                             d_0_mu = meta_param_ex[ param_j, "d_0_mu" ],
+                             d_1_mu = meta_param_ex[ param_j, "d_1_mu" ] )
+
+```
+
+### Summary of clustering results
+
+```{r sim_study_5_1_summary}
+summary(cluster_ex)
+```
+
+### Visualizing clustering results.
+
+Int the first two plots we show the results across all the MCMC samples. First, a heatmap showing the joint allocation of individuals to clusters. Second, the number of clusters obtained along iterations of 
+the MCMC. 
+
+```{r sim_study_5_1_plot_1, out.width="50%", fig.align="center"}
+# Heatmap of group allocation
+plot(cluster_ex,type="heatmap")
+```
+
+```{r sim_study_5_1_plot_2, out.width="50%", fig.align="center"}
+# Number of clusters obtain across the MCMC chain
+plot(cluster_ex,type="chain")
+```
+
+### Comparison of resulting cluster configurations.
+
+Once the MCMC has converged, each iteration corresponds to a different clustering configuration for each data point. Here we show some configurations of interest.
+
+The jittered scatter plot below compares:
+1. X-axis: Labels from configuration that minimizes the distance with average MCMC iterations
+2. Y-axis: Labels from configuration that minimizes an Heterogeneity Measure (HM)
+
+The plot confirms that both configurations agree on the allocation of individuals to their corresponding cluster. (Jitter added for clarity, label switching of clusters is natural).
+
+```{r sim_study_5_1_plot_3, out.width="50%", fig.align="center"}
+plot( x=jitter(cluster_ex$cluster),y=jitter(cluster_ex$clusterHMmin), col="#FF000080", pch=20,
+      main=paste("Comparison of two relevant cluster configurations"),
+      xlab="minimizes distance to average MCMC grouping", ylab="minimizes Heterogeneity Measure" )
+```
+
+We compare the true (generative) cluster allocation to the configuration suggested by the model:
+1. X-axis: Original Labels in the generative model.
+2. Y-axis: Labels assigned by the clustering method.
+
+```{r sim_study_5_1_plot_4, out.width="50%", fig.align="center"}
+plot(x=jitter(Z_latent_ex_5_1$cluster),
+     y=jitter(cluster_ex$cluster),
+     main=paste("Comparison real configuration with the model results"),
+     xlab="True cluster",
+     ylab="Model cluster",
+     pch=19, col="#FF000080")
+```
