@@ -2,3 +2,13 @@
 .Rhistory
 .RData
 .Ruserdata
+.tmp
+inst/include/BNPMIXcluster.h
+inst/include/BNPMIXcluster_RcppExports.h
+R/RcppExports.R
+src/*.dll
+src/*.o
+src/*.so
+src/RcppExports.cpp
+man/*
+**/.DS_Store
