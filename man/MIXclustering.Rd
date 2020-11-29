@@ -112,7 +112,7 @@ The model consists on a Bayesian non-parametric approach for clustering that is 
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC.
 
-A full description of the model is in the article Carmona et al. (2016) (\url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
+A full description of the model is in the article Carmona et al. (2016) (\url{https://arxiv.org/abs/1612.00083}). See \code{Reference}.
 
 The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
 
