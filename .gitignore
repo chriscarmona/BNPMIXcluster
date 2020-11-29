@@ -3,9 +3,6 @@
 .RData
 .Ruserdata
 .tmp
-R/RcppExports.R
-src/*.dll
 src/*.o
 src/*.so
-src/RcppExports.cpp
 **/.DS_Store
