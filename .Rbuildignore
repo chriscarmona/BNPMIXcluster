@@ -4,3 +4,4 @@
 ^renv$
 ^renv\.lock$
 ^README\.Rmd$
+^cran-comments\.md$
