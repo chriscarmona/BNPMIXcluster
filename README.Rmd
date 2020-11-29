@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 # BNPMIXcluster
 
 <!-- badges: start -->
+[![](https://img.shields.io/badge/doi-10.1007/s11634--018--0313--6-yellow.svg)](https://doi.org/10.1007/s11634-018-0313-6)
+[![](https://img.shields.io/badge/devel%20version-1.3-blue.svg)](https://github.com/christianu7/BNPMIXcluster)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
 <!-- badges: end -->
 
 The BNPMIXcluster package provides a method for model-based clustering of multivariate data. It is capable of combining different types of variables (continuous, ordinal and nominal) and accommodating for different sampling probabilities in a complex survey design.
