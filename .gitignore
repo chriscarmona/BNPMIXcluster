@@ -8,5 +8,4 @@ src/*.dll
 src/*.o
 src/*.so
 src/RcppExports.cpp
-man/*
 **/.DS_Store
