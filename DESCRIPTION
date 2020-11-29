@@ -3,13 +3,13 @@ Type: Package
 Title: Bayesian Nonparametric Model for Clustering with Mixed Scale Variables
 Version: 1.3
 Date: 2020-11-28
-Authors@R: c(person("Christian", "Carmona", role = c("aut", "cre"), email = "carmona@stats.ox.ac.uk"),
-             person("Luis", "Nieto-Barajas", role = "aut", email = " lnieto@itam.mx"),
-             person("Antonio", "Canale", role = "ctb", email = "antonio.canale@unito.it")
+Authors@R: c(person("Christian", "Carmona", role = c("aut", "cre"), email = "carmona@stats.ox.ac.uk", comment = c(ORCID = "0000-0003-0224-4968")),
+             person("Luis", "Nieto-Barajas", role = "aut", email = " lnieto@itam.mx", comment = c(ORCID = "0000-0002-0859-7679")),
+             person("Antonio", "Canale", role = "ctb", email = "antonio.canale@unito.it", comment = c(ORCID = "0000-0002-5403-0040"))
              )
 Description: Model-based approach for clustering of multivariate data, capable of combining different types of variables (continuous, ordinal and nominal) and accommodating for different sampling probabilities in a complex survey design. The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables. Details of the underlying model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) <arXiv:1612.00083>.
 License: MIT + file LICENSE
-URL: https://github.com/christianu7/BNPMIXcluster/
+URL: https://github.com/christianu7/BNPMIXcluster
 BugReports: https://github.com/christianu7/BNPMIXcluster/issues
 LazyData: TRUE
 Depends:
