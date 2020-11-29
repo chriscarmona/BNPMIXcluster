@@ -3,8 +3,6 @@
 .RData
 .Ruserdata
 .tmp
-inst/include/BNPMIXcluster.h
-inst/include/BNPMIXcluster_RcppExports.h
 R/RcppExports.R
 src/*.dll
 src/*.o
