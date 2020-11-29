@@ -260,7 +260,7 @@
 #' }
 #'
 #' @references
-#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{http://arxiv.org/abs/1612.00083})
+#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{https://arxiv.org/abs/1612.00083})
 #'
 #' @importFrom stats aggregate as.formula cor rgamma rmultinom sd
 #' @import plyr

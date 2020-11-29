@@ -137,7 +137,7 @@ The clustering model will be based in an appropriate choice of the prior distrib
 
 \eqn{\mu_i | G}~\eqn{G}, iid for \eqn{i=1,...,n}
 
-Where \eqn{G}~\eqn{PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centring measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
+Where \eqn{G}~\eqn{PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centering measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
 
 In consequence, this choice of prior implies that the \eqn{\mu_i}'s are exchangeable with marginal distribution \eqn{\mu_i}~\eqn{G_0} for all \eqn{i=1,...,n}.
 
@@ -300,7 +300,7 @@ plot(cluster_poverty,type="chain")
 
 }
 \references{
-Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{http://arxiv.org/abs/1612.00083})
+Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{https://arxiv.org/abs/1612.00083})
 }
 \seealso{
 \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.
