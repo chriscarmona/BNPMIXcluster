@@ -15,7 +15,6 @@ log_f_post_Omega <- function(Omega,
     aux_s <- matrix(Z[i,]-mu_Z[i,],nrow=n_q,ncol=1)
     S_mat <- S_mat + 1/sampling_prob[i] * aux_s %*% t(aux_s)
   }
-  #browser()
   log_posterior_Omega <- -(1/2)*(n_q+1) * sum(log(abs(diag(Omega)))) - (1/2) * (n+2-n_q*(n_q-1)) * det(Omega) - (1/2) * sum(diag( solve(Omega) %*% (solve(Lambda) %*% S_mat %*% solve(Lambda)) ))
 
   return( log_posterior_Omega )

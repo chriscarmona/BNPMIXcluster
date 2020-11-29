@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_Omega_ij.R
 \name{sampling_Omega_ij}
 \alias{sampling_Omega_ij}
-\title{MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for Bayesian clustering.}
 \usage{
 sampling_Omega_ij(
   n = 1,
@@ -32,13 +32,13 @@ sampling_Omega_ij(
 
 \item{delta}{defines the maximum jump on each iteration of the MCMC as \eqn{1/delta} of the feasible interval for \eqn{\Omega_{i,j}}}
 
-\item{Z}{bla}
+\item{Z}{Latent continuous variables}
 
-\item{mu_Z}{bla}
+\item{mu_Z}{Mean of the continuous latent variables}
 
-\item{Lambda}{bla}
+\item{Lambda}{Standard deviations in the decomposition of the covariance matrix}
 
-\item{sampling_prob}{bla}
+\item{sampling_prob}{sampling probabilities for each observation, for complex surveys.}
 
 \item{n.burn}{number of iterations in the simulation considered in the burn-in period.}
 

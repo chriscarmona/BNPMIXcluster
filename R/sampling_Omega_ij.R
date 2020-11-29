@@ -1,5 +1,5 @@
 #' @title
-#'   MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'   MCMC sampling of parameter "\eqn{\Omega_{i,j}}" in the \emph{mixdpcluster} model for Bayesian clustering.
 #'
 #' @description
 #'   Generates a sample from the the posterior distribution of the \eqn{(i,j)} element of the \eqn{\Omega} matrix in the \emph{mixdpcluster} model for bayesian clustering.
@@ -10,10 +10,10 @@
 #' @param i indicates the row for \eqn{\Omega_{i,j}}
 #' @param j indicates the column for \eqn{\Omega_{i,j}}
 #' @param delta defines the maximum jump on each iteration of the MCMC as \eqn{1/delta} of the feasible interval for \eqn{\Omega_{i,j}}
-#' @param Z bla
-#' @param mu_Z bla
-#' @param Lambda bla
-#' @param sampling_prob bla
+#' @param Z Latent continuous variables
+#' @param mu_Z Mean of the continuous latent variables
+#' @param Lambda Standard deviations in the decomposition of the covariance matrix
+#' @param sampling_prob sampling probabilities for each observation, for complex surveys.
 #' @param n.burn number of iterations in the simulation considered in the burn-in period.
 #' @param n.thin number of iterations discarded between two simulated values (for thinning of the MCMC chain).
 #' @param max.time maximum allowed time for the simulation process. The function returns \code{Error} if exceeded.

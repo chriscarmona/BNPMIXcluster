@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_a.R
 \name{sampling_a}
 \alias{sampling_a}
-\title{MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for Bayesian clustering.}
 \usage{
 sampling_a(
   n = 1,
@@ -32,7 +32,7 @@ sampling_a(
 
 \item{d_1_a}{parameter \eqn{d_1^a} in the posterior distribution of a}
 
-\item{mu_star_n_r}{bla}
+\item{mu_star_n_r}{vector with number of observations allocated to each cluster}
 
 \item{n.burn}{number of iterations in the simulation considered in the burn-in period.}
 

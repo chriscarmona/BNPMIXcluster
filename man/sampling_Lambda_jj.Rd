@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_Lambda_jj.R
 \name{sampling_Lambda_jj}
 \alias{sampling_Lambda_jj}
-\title{MCMC sampling of parameter "\eqn{\Lambda_{j,j}}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{\Lambda_{j,j}}" in the \emph{mixdpcluster} model for Bayesian clustering.}
 \usage{
 sampling_Lambda_jj(
   n_sim_mh = 1,

@@ -1,5 +1,5 @@
 #' @title
-#'   MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'   MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for Bayesian clustering.
 #'
 #' @description
 #'   Generates a sample from the posterior distribution of \eqn{b} in the \emph{mixdpcluster} model for bayesian clustering.

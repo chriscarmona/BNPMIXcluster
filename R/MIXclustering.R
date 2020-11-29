@@ -2,7 +2,7 @@
 #'     Bayesian Nonparametric Model for Clustering with Mixed Scale Variables
 #'
 #' @description
-#'     \code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
+#'     \code{MIXclustering} is used to perform cluster analysis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
 #'
 #' @param Y Matrix or data frame containing the data to be clustered.
 #'
@@ -18,7 +18,7 @@
 #'
 #' @param n_iter_out Number of effective iterations in the MCMC procedure for clustering.
 #' @param n_burn Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.
-#' @param n_thin Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.
+#' @param n_thin Number of iterations discarded for thinning the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.
 #'
 #' @param a_fix A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.
 #' @param alpha Hyperparameter in the prior distribution of \eqn{a}. See \code{details}.
@@ -40,15 +40,15 @@
 #' @param d_1_mu Hyperparameter in the prior distribution of the variance of the location in each cluster. See \code{details}.
 #'
 #' @param log_file Specifies a file to save the details with the execution time and the parameters used.
-#' @param keep_param_chains Indicates wheter the simulations of parameters \code{a}, \code{b}, \code{lambda} and \code{omega} should be returned as output.
+#' @param keep_param_chains Indicates if the simulations of parameters \code{a}, \code{b}, \code{lambda} and \code{omega} should be returned as output.
 #'
 #' @details
 #'
-#' The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
+#' The model consists on a Bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 #'
 #' Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC.
 #'
-#' A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
+#' A full description of the model is in the article Carmona et al. (2016) (\url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 #'
 #' The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
 #'
@@ -73,7 +73,7 @@
 #'
 #' \eqn{\mu_i | G}~\eqn{G}, iid for \eqn{i=1,...,n}
 #'
-#' Where \eqn{G}~\eqn{PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centring measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
+#' Where \eqn{G}~\eqn{PD(a,b,G_0)} is a Poisson-Dirichlet process with parameters \eqn{a \in [0,1)}, \eqn{b>-a} and centering measure \eqn{G_0}. The Dirichlet and the normalized stable processes arise when \eqn{a=0} and when \eqn{b=0}, respectively.
 #'
 #' In consequence, this choice of prior implies that the \eqn{\mu_i}'s are exchangeable with marginal distribution \eqn{\mu_i}~\eqn{G_0} for all \eqn{i=1,...,n}.
 #'
@@ -93,7 +93,7 @@
 #'
 #' For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 #'
-#' Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents). These parameters are not recomended to be changed (used in the internal functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij}).
+#' Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents). These parameters are not recommended to be changed (used in the internal functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij}).
 #'
 #' @return
 #' \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
@@ -260,7 +260,7 @@
 #' }
 #'
 #' @references
-#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
+#' Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{http://arxiv.org/abs/1612.00083})
 #'
 #' @importFrom stats aggregate as.formula cor rgamma rmultinom sd
 #' @import plyr

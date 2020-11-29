@@ -8,11 +8,11 @@
 #'     Simulated data for testing the \emph{BNPMIXcluster} package
 #'
 #' @description
-#'     Simulated values for three continuos variables under the existence of three clusters.
+#'     Simulated values for three continuous variables under the existence of three clusters.
 #'
 #'     The data consists of a three-variate Normal distribution with different mean and covariance matrix between clusters.
 #'
-#'     This can be assumed either as continuos data to be clustered Y=(Y_1,Y_2,Y_3); or also can be used as the underlying latent data that can be transformed into observable variables Y_i=f(Z_i), which can be continuos or categorical.
+#'     This can be assumed either as continuous data to be clustered Y=(Y_1,Y_2,Y_3); or also can be used as the underlying latent data that can be transformed into observable variables Y_i=f(Z_i), which can be continuous or categorical.
 #'
 #' @usage
 #'     Z_latent_ex_5_1
@@ -21,7 +21,7 @@
 #'     A data frame with 100 rows and 4 variables.
 #'     \describe{
 #'         \item{cluster}{Indicates the cluster for each row}
-#'         \item{Z1,Z2,Z3}{Continuos values coming from a multivariate normal distribution, given the cluster}
+#'         \item{Z1,Z2,Z3}{Continuous values coming from a multivariate normal distribution, given the cluster}
 #'     }
 #'
 #' @details

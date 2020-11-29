@@ -44,7 +44,7 @@ MIXclustering(
 
 \item{n_burn}{Number of iterations discarded as part of the burn-in period at the beginning MCMC procedure.}
 
-\item{n_thin}{Number of iterations discarded for thining the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.}
+\item{n_thin}{Number of iterations discarded for thinning the chain (reducing the autocorrelation). We keep 1 of every n_thin iterations.}
 
 \item{a_fix}{A numeric value to set the parameter \eqn{a} in the model. If \code{NULL} (default), the parameter \eqn{a} is assigned a prior distribution. See \code{details}.}
 
@@ -80,7 +80,7 @@ MIXclustering(
 
 \item{log_file}{Specifies a file to save the details with the execution time and the parameters used.}
 
-\item{keep_param_chains}{Indicates wheter the simulations of parameters \code{a}, \code{b}, \code{lambda} and \code{omega} should be returned as output.}
+\item{keep_param_chains}{Indicates if the simulations of parameters \code{a}, \code{b}, \code{lambda} and \code{omega} should be returned as output.}
 }
 \value{
 \code{MIXclustering} returns a S3 object of class "\code{MIXcluster}".
@@ -105,14 +105,14 @@ An object of class "MIXcluster" is a list containing the following components:
 }
 }
 \description{
-\code{MIXclustering} is used to perform cluster analisis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
+\code{MIXclustering} is used to perform cluster analysis of individuals using a Bayesian nonparametric mixture model that jointly models mixed scale data and accommodates for different sampling probabilities. The model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016).
 }
 \details{
-The model consists on a bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
+The model consists on a Bayesian non-parametric approach for clustering that is capable to combine different types of variables through the usage of associated continuous latent variables. The clustering mechanism is based on a location mixture model with a Poisson-Dirichlet (\eqn{PD}) process prior on the location parameters \eqn{\mu_i ; i=1,...,n} of the associated latent variables.
 
 Computational inference about the cluster allocation and the posterior distribution of the parameters are performed using MCMC.
 
-A full description of the model is in the article Carmona et al. (2016) (preprint: \url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
+A full description of the model is in the article Carmona et al. (2016) (\url{http://arxiv.org/abs/1612.00083}). See \code{Reference}.
 
 The model consider an individual \eqn{y_i} that is characterized by a multivariate response of dimension \eqn{p}, i.e., \eqn{y_i=(y_{i,1},...,y_{i,p})}. The total number of variables \eqn{p} is divided into \eqn{c} continuous variables, \eqn{o} ordinal variables, and \eqn{m} nominal variables such that \eqn{p=c+o+m}.
 
@@ -157,7 +157,7 @@ The definition of these values also affect the number of resulting clusters sinc
 
 For example, increasing the values of \code{d_1_a} and \code{d_1_b} reduce the number of groups.
 
-Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents). These parameters are not recomended to be changed (used in the internal functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij}).
+Finally, the function parameters \code{eta}, \code{kappa}, \code{delta} are tuning parameters that control the acceptance rate in the random-walk MH steps of the new proposed values for the parameters \eqn{b}, \eqn{\Lambda_{j,j}} (variance of latents) and \eqn{\Omega_{i,j}} (correlation of latents). These parameters are not recommended to be changed (used in the internal functions: \code{sampling_b} , \code{sampling_Lambda_jj} , \code{sampling_Omega_ij}).
 }
 \examples{
 
@@ -300,7 +300,7 @@ plot(cluster_poverty,type="chain")
 
 }
 \references{
-Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (preprint: \url{http://arxiv.org/abs/1612.00083})
+Carmona, C., Nieto-Barajas, L. E. & Canale, A. (2017). \emph{Model based approach for household clustering with mixed scale variables.} (\url{http://arxiv.org/abs/1612.00083})
 }
 \seealso{
 \code{\link{summary.MIXcluster}} for a summary of the clustering results, \code{\link{plot.MIXcluster}} for graphical representation of results.

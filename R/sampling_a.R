@@ -1,5 +1,5 @@
 #' @title
-#'   MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'   MCMC sampling of parameter "\eqn{a}" in the \emph{mixdpcluster} model for Bayesian clustering.
 #'
 #' @description
 #'   Generates a sample from the posterior distribution of \eqn{a} in the \emph{mixdpcluster} model for bayesian clustering.
@@ -11,7 +11,7 @@
 #' @param alpha parameter \eqn{\alpha} in the posterior distribution of a
 #' @param d_0_a parameter \eqn{d_0^a} in the posterior distribution of a
 #' @param d_1_a parameter \eqn{d_1^a} in the posterior distribution of a
-#' @param mu_star_n_r bla
+#' @param mu_star_n_r vector with number of observations allocated to each cluster
 #' @param n.burn number of iterations in the simulation considered in the burn-in period.
 #' @param n.thin number of iterations discarded between two simulated values (for thinning of the MCMC chain).
 #' @param max.time maximum allowed time for the simulation process. The function returns \code{Error} if exceeded.

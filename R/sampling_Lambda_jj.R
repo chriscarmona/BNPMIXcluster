@@ -1,5 +1,5 @@
 #' @title
-#'   MCMC sampling of parameter "\eqn{\Lambda_{j,j}}" in the \emph{mixdpcluster} model for bayesian clustering.
+#'   MCMC sampling of parameter "\eqn{\Lambda_{j,j}}" in the \emph{mixdpcluster} model for Bayesian clustering.
 #'
 #' @description
 #'   Generates a sample from the the posterior distribution of the j-th diagonal element \eqn{(i,j)} of the \eqn{\Lambda} matrix in the \emph{mixdpcluster} model for bayesian clustering.

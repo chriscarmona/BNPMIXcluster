@@ -23,8 +23,8 @@
 #' @importFrom MASS ginv
 #'
 #' @details
-#'     For each variable in the \code{Y} data frame, an associated continuos latent variable is generated.
-#'     if \eqn{Y_j} is continuos, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
+#'     For each variable in the \code{Y} data frame, an associated continuous latent variable is generated.
+#'     if \eqn{Y_j} is continuous, the corresponding \eqn{Z_j} will keep the original values of \eqn{Y_j}.
 #'     If \eqn{Y_j} is categorical, the function will scan the unique values of \eqn{Y_j} and generate continuous latent variables accordingly.
 #'
 #' @keywords internal
@@ -109,7 +109,7 @@ get_latents <- function( Y,
   
   # colnames of Z #
   colnames_Z <- NULL
-  # colnames of Z: continuos #
+  # colnames of Z: continuous #
   if( n_c > 0 ) {
     colnames_Z <- c( colnames_Z, paste("var_",
                                        rep(var_type_all[1],n_c),"_",
@@ -150,7 +150,7 @@ get_latents <- function( Y,
     # cat('Simulating latents for ',n_c,' Continuous variables   ')
     if( is.null(Z_old) ) {
       Z[,1:n_c] <- as.matrix( Y[,1:n_c] )
-      # standardize the continuos variables
+      # standardize the continuous variables
       #Z[,1:n_c] <- as.matrix( scale(Y[,1:n_c]) , nrow=nrow(Y), ncol=n_c )
     } else {
       Z[,1:n_c] <- Z_old[,1:n_c]

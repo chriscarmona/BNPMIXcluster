@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling_b.R
 \name{sampling_b}
 \alias{sampling_b}
-\title{MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for bayesian clustering.}
+\title{MCMC sampling of parameter "\eqn{b}" in the \emph{mixdpcluster} model for Bayesian clustering.}
 \usage{
 sampling_b(
   n_sim_mh = 1,

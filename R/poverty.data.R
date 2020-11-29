@@ -17,7 +17,7 @@
 #'     \url{http://www.coneval.org.mx/Medicion/MP/Documents/Programas_calculo_pobreza_10_12_14/R_2014.zip}
 #'     )
 #'
-#'     This data frame presents indicators aggregated by household. The aggregation was done by the authors acording with code in section \code{Examples}.
+#'     This data frame presents indicators aggregated by household. The aggregation was done by the authors according with code in section \code{Examples}.
 #'
 #' @usage
 #'     poverty.data
@@ -29,7 +29,7 @@
 #'     \item{\code{proyecto}}{ Data source identifier (1=MCS, 2=ENIGH) }
 #'     \item{\code{folioviv}}{ Household identifier level 1 }
 #'     \item{\code{foliohog}}{ Household identifier level 2 }
-#'     \item{\code{ict_norm}}{(continuous) Total income in the household (in mexican pesos).}
+#'     \item{\code{ict_norm}}{(continuous) Total income in the household (in Mexican pesos).}
 #'     \item{\code{ic_ali}}{(binary) Indicator for deprivation to feeding: 1-yes,0-no }
 #'     \item{\code{ic_asalud}}{(binary) Indicator for deprivation to health services: 1-yes,0-no }
 #'     \item{\code{ic_cv}}{(binary) Housing quality: 1-bad, 0-good }
