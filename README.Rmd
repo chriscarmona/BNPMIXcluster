@@ -35,7 +35,7 @@ You can install the released version of BNPMIXcluster from [CRAN](https://CRAN.R
 install.packages("BNPMIXcluster")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+And the development version from [GitHub](https://github.com/christianu7/BNPMIXcluster) with:
 
 ``` r
 # install.packages("devtools")
