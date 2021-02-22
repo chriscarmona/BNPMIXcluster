@@ -1,0 +1,16 @@
+citHeader("To cite BNPMIXcluster in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = Model-based approach for household clustering with mixed scale variables,
+  author   = Carmona, Christian and Nieto-Barajas, Luis and Canale, Antonio,
+  journal  = Advances in Data Analysis and Classification,
+  year     = 2019,
+  volume   = 13,
+  number   = 2,
+  pages    = 559--583,
+  url      = https://doi.org/10.1007/s11634-018-0313-6,
+  textVersion = paste(
+    Carmona, C., Nieto-Barajas, L., & Canale, A. (2019). Model-based approach for household clustering with mixed scale variables. Advances in Data Analysis and Classification, 13(2), 559-583.
+  )
+)

@@ -16,16 +16,36 @@ knitr::opts_chunk$set(
 # BNPMIXcluster
 
 <!-- badges: start -->
-[![](https://img.shields.io/badge/doi-10.1007/s11634--018--0313--6-yellow.svg)](https://doi.org/10.1007/s11634-018-0313-6)
-[![](https://img.shields.io/badge/devel%20version-1.3-blue.svg)](https://github.com/christianu7/BNPMIXcluster)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://cran.r-project.org/web/licenses/MIT)
+[![CRAN status](https://www.r-pkg.org/badges/version/BNPMIXcluster)](https://CRAN.R-project.org/package=BNPMIXcluster)
+[![devel-version](https://img.shields.io/badge/devel%20version-1.3-blue.svg)](https://github.com/christianu7/BNPMIXcluster)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![doi](https://img.shields.io/badge/doi-10.1007/s11634--018--0313--6-yellow.svg)](https://doi.org/10.1007/s11634-018-0313-6)
 <!-- badges: end -->
 
 The BNPMIXcluster package provides a method for model-based clustering of multivariate data. It is capable of combining different types of variables (continuous, ordinal and nominal) and accommodates for different sampling probabilities in a complex survey design.
 
 The model is based on a location mixture model with a Poisson-Dirichlet process prior on the location parameters of the associated latent variables.
 
-Details of the underlying model is described in Carmona, C., Nieto-Barajas, L. E., Canale, A. (2016) [arXiv:1612.00083](https://arxiv.org/abs/1612.00083).
+## Citing
+
+If you use BNPMIXcluster in a scientific publication, we encourage you to add
+the following references to the related papers:
+```bibtex
+@article{Carmona2019,
+    title = {Model-based approach for household clustering with mixed scale variables},
+    author = {Carmona, Christian and Nieto-Barajas, Luis and Canale, Antonio},
+    journal = {Advances in Data Analysis and Classification},
+    year = {2019}
+    month = {jun},
+    volume = {13},
+    number = {2},
+    pages = {559--583},
+    doi = {10.1007/s11634-018-0313-6},
+    arxivId = {1612.00083},
+    url = {https:www.doi.org/10.1007/s11634-018-0313-6},
+}
+```
 
 ## Installation
 

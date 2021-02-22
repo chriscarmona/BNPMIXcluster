@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.0.3",
+    "Version": "4.0.4",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -18,24 +18,24 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-53",
+      "Version": "7.3-53.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "d1bc1c8e9c0ace57ec9ffea01021d45f"
+      "Hash": "4ef21dd0348b9abb7f8bd1d77e4cd0c3"
     },
     "Rcpp": {
       "Package": "Rcpp",
-      "Version": "1.0.5",
+      "Version": "1.0.6",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "125dc7a0ed375eb68c0ce533b48d291f"
+      "Hash": "dbb5e436998a7eba5a9d682060533338"
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "0.10.1.2.0",
+      "Version": "0.10.2.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "1a885965adade4b8629c478a3b3c2cf7"
+      "Hash": "a2de53472129933a29975e7cfa3ffe28"
     },
     "base64enc": {
       "Package": "base64enc",
@@ -53,10 +53,10 @@
     },
     "caTools": {
       "Package": "caTools",
-      "Version": "1.18.0",
+      "Version": "1.18.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "6f7c1405e500ef25a7c147e860b5fe32"
+      "Hash": "f5b3e8f693522708cd9444c839b432e0"
     },
     "digest": {
       "Package": "digest",
@@ -102,24 +102,24 @@
     },
     "htmltools": {
       "Package": "htmltools",
-      "Version": "0.5.0",
+      "Version": "0.5.1.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "7d651b7131794fe007b1ad6f21aaa401"
+      "Hash": "af2c2531e55df5cf230c4b5444fc973c"
     },
     "jsonlite": {
       "Package": "jsonlite",
-      "Version": "1.7.1",
+      "Version": "1.7.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "1ec84e070b88b37ed169f19def40d47c"
+      "Hash": "98138e0994d41508c7a6b84a0600cfcb"
     },
     "knitr": {
       "Package": "knitr",
-      "Version": "1.30",
+      "Version": "1.31",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "eed7ee0d02eee88d53881cdc92457c62"
+      "Hash": "c3994c036d19fc22c5e2a209c8298bfb"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -144,10 +144,10 @@
     },
     "mime": {
       "Package": "mime",
-      "Version": "0.9",
+      "Version": "0.10",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "e87a35ec73b157552814869f45a63aa3"
+      "Hash": "26fa77e707223e1ce042b2b5d09993dc"
     },
     "mvtnorm": {
       "Package": "mvtnorm",
@@ -165,24 +165,24 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "0.12.3",
+      "Version": "0.12.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b5510c50c7f31d453c385c7b460af2b9"
+      "Hash": "5c0cdb37f063c58cdab3c7e9fbb8bd2c"
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.9",
+      "Version": "0.4.10",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "9d7aba7bed9a79e2403b4777428a2b12"
+      "Hash": "599df23c40a4fce9c7b4764f28c37857"
     },
     "rmarkdown": {
       "Package": "rmarkdown",
-      "Version": "2.5",
+      "Version": "2.7",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "20a0a94af9e8f7040510447763aab3e9"
+      "Hash": "edbf4cb1aefae783fd8d3a008ae51943"
     },
     "scatterplot3d": {
       "Package": "scatterplot3d",
@@ -207,10 +207,10 @@
     },
     "tinytex": {
       "Package": "tinytex",
-      "Version": "0.27",
+      "Version": "0.29",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "264b4a31d35bb6833566a7763356ab63"
+      "Hash": "f0b0ba735febac9a8344253ae6fa93f5"
     },
     "truncnorm": {
       "Package": "truncnorm",
@@ -221,10 +221,10 @@
     },
     "xfun": {
       "Package": "xfun",
-      "Version": "0.19",
+      "Version": "0.21",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "a42372606cb76f34da9d090326e9f955"
+      "Hash": "f3ddcca198959a42e8cb6b06c30d4f1e"
     },
     "yaml": {
       "Package": "yaml",
