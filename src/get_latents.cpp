@@ -40,9 +40,8 @@ arma::mat get_latents_cpp( arma::mat Y,
   unsigned int cat_Yij;
   
   // possible variable classes that are allowed
-  arma::vec var_type_all;
-  var_type_all << 1 << 2 << 3 << arma::endr;
-  
+  arma::vec var_type_all({1, 2, 3});
+    
   // checking input consistency
   if( var_type.n_rows != p ) {
     throw std::range_error("The number of columns in Y have to be equal to the lenght of vector var_type");
